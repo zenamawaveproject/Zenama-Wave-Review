@@ -67,17 +67,22 @@
     </footer>
 
     <script>
+        // Ambil ID dari Query URL atau LocalStorage
         const urlParams = new URLSearchParams(window.location.search);
-        const cardId = urlParams.get('id') || localStorage.getItem('wave_card_id');
+        let rawId = urlParams.get('id') || localStorage.getItem('wave_card_id');
 
-        if (!cardId) {
+        if (!rawId) {
             window.location.href = '/login.html';
         }
+
+        const cardId = rawId.toUpperCase();
+        // Simpan versi terformat kapital agar sinkron
+        localStorage.setItem('wave_card_id', cardId);
 
         // Load data dashboard dari Cloudflare Functions
         async function loadDashboardData() {
             try {
-                const res = await fetch(`/api/dashboard?id=${cardId}`);
+                const res = await fetch(`/api/dashboard?id=${encodeURIComponent(cardId)}`);
                 const data = await res.json();
 
                 if (data.success) {
@@ -88,7 +93,8 @@
                     document.getElementById('statQr').innerText = data.stats?.total_qr || 0;
                     document.getElementById('statTap').innerText = data.stats?.total_tap || 0;
                 } else {
-                    alert(data.message);
+                    alert(data.message || "Gagal memuat data kartu.");
+                    localStorage.removeItem('wave_card_id');
                     window.location.href = '/login.html';
                 }
             } catch (e) {
