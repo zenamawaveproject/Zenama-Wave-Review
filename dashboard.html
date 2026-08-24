@@ -612,13 +612,14 @@
             const formattedActDate = `${actDate.getDate()} ${namaBulanIndo[actDate.getMonth() + 1]} ${actDate.getFullYear()} ${String(actDate.getHours()).padStart(2, '0')}:${String(actDate.getMinutes()).padStart(2, '0')}:${String(actDate.getSeconds()).padStart(2, '0')} WIB`;
             document.getElementById('activatedFormattedText').innerHTML = `<i class="fa-solid fa-bolt text-amber-500 mr-1"></i> ${formattedActDate}`;
 
-            // QR Saya
-            const userQrUrl = `${window.location.origin}/${encodeURIComponent(username)}/qr`;
+            // --- PERBAIKAN GENERATE QR CODE SESUAI ID SERI ---
+            const userQrUrl = `https://cards.zenamagroup.com/?id=${encodeURIComponent(data.idSeri)}&src=qr`;
             const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(userQrUrl)}`;
             
             document.getElementById('qrBadgeTitle').innerText = `${clientName} (${data.idSeri})`;
             document.getElementById('qrImage').src = qrApiUrl;
             document.getElementById('qrUrlDisplay').innerText = userQrUrl;
+            // --------------------------------------------------
 
             // Settings Fields
             document.getElementById('settingReviewUrl').value = reviewUrl;
