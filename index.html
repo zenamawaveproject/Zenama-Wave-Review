@@ -1,68 +1,295 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wave by Zenama Group - Smart Google Review Card</title>
+    <title>ZenamaWave - Papan Akrilik NFC & QR Ulasan Google Bisnis</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between">
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-blue-500 selection:text-white min-h-screen flex flex-col justify-between">
 
-    <!-- NAV BAR UTAMA -->
-    <nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
-        <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <span class="text-xl font-extrabold tracking-wider bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">WAVE</span>
-                <span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded border border-slate-700">by Zenama</span>
+    <!-- NAVBAR UTAMA -->
+    <header class="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <span class="font-extrabold text-xl tracking-tight">
+                    <span class="text-blue-600">Zenama</span><span class="text-emerald-500">Wave</span>
+                </span>
             </div>
-            <a href="/login.html" class="text-xs bg-slate-800 hover:bg-slate-700 text-blue-400 px-4 py-2 rounded-lg font-semibold border border-slate-700 transition">
-                Login Dashboard
-            </a>
+            <nav class="hidden md:flex items-center space-x-6 text-xs font-semibold text-gray-600">
+                <a href="#produk" class="hover:text-blue-600 transition">Produk Akrilik</a>
+                <a href="#cara-kerja" class="hover:text-blue-600 transition">Cara Kerja</a>
+                <a href="#fitur" class="hover:text-blue-600 transition">Fitur & Dashboard</a>
+                <a href="#panduan" class="hover:text-blue-600 transition">Panduan</a>
+                <a href="#harga" class="hover:text-blue-600 transition">Harga Promo</a>
+            </nav>
+            <div class="flex items-center space-x-3">
+                <a href="/login.html" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3.5 py-2 rounded-xl border border-slate-300 transition">
+                    Login
+                </a>
+                <a href="https://wa.me/62881036966171?text=Halo%20Admin%20ZenamaWave,%20saya%20mau%20pesan%20Papan%20Akrilik%20NFC%20Promo%2063k" 
+                   target="_blank" 
+                   class="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm">
+                    <i class="fa-brands fa-whatsapp text-base"></i>
+                    <span>Beli Sekarang</span>
+                </a>
+            </div>
         </div>
-    </nav>
+    </header>
 
     <!-- TAMPILAN 1: LANDING PAGE BRANDING -->
-    <main id="brandingSection" class="max-w-4xl mx-auto px-4 py-12 text-center flex-1 flex flex-col items-center justify-center">
-        <div class="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs px-3 py-1.5 rounded-full mb-6">
-            ✨ Smart NFC Card for Business Growth
-        </div>
-        
-        <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-white mb-6">
-            Tingkatkan Rating Google Review Usahamu <span class="bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">Hanya 1 Kali Tap</span>
-        </h1>
-        
-        <p class="text-slate-400 text-sm sm:text-base max-w-2xl mb-8 leading-relaxed">
-            Solusi praktis mendapatkan ulasan berbintang 5 dari pelanggan secara instan. Tanpa perlu ketik nama tempat, cukup dekatkan HP pelanggan ke Kartu Smart Wave.
-        </p>
+    <div id="brandingSection" class="flex-1">
+        <!-- HERO SECTION -->
+        <section class="py-16 md:py-20 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
+            <span class="inline-flex items-center space-x-2 bg-blue-50 text-blue-600 border border-blue-200 px-3 py-1 rounded-full text-xs font-bold">
+                <i class="fa-solid fa-bolt text-amber-500"></i>
+                <span>Solusi Panen Ulasan Bintang 5 Instan</span>
+            </span>
+            
+            <h1 class="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight max-w-3xl mx-auto">
+                Tingkatkan Kepercayaan Pelanggan dengan <span class="text-blue-600">Papan Akrilik Smart Review</span>
+            </h1>
+            
+            <p class="text-slate-600 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
+                Cukup tempelkan HP (NFC) atau scan QR Code, halaman ulasan Google Maps toko Anda akan langsung terbuka otomatis dalam kurun waktu kurang dari 5 detik!
+            </p>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-3xl my-8 text-left">
-            <div class="bg-slate-800/50 p-5 rounded-xl border border-slate-800">
-                <div class="text-2xl mb-2">⚡</div>
-                <h3 class="font-bold text-white text-sm mb-1">Teknologi NFC & QR</h3>
-                <p class="text-xs text-slate-400">Kompatibel dengan semua jenis smartphone iOS dan Android.</p>
+            <!-- PREVIEW GAMBAR AKRILIK -->
+            <div id="produk" class="pt-6 max-w-sm mx-auto">
+                <div class="bg-white p-4 rounded-3xl border border-gray-200 shadow-xl relative group">
+                    <img src="https://wave.zenamagroup.com/assets/znm-akrilik-wave.png" 
+                         alt="Model Papan Akrilik NFC ZenamaWave" 
+                         class="w-full h-auto rounded-2xl object-cover shadow-sm group-hover:scale-105 transition duration-300">
+                    <span class="absolute top-7 right-7 bg-emerald-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow">
+                        NFC + QR Code
+                    </span>
+                </div>
             </div>
-            <div class="bg-slate-800/50 p-5 rounded-xl border border-slate-800">
-                <div class="text-2xl mb-2">🔄</div>
-                <h3 class="font-bold text-white text-sm mb-1">Link Bisa Diubah</h3>
-                <p class="text-xs text-slate-400">Atur & ganti link tujuan review kapan saja lewat dashboard mandiri.</p>
-            </div>
-            <div class="bg-slate-800/50 p-5 rounded-xl border border-slate-800">
-                <div class="text-2xl mb-2">♾️</div>
-                <h3 class="font-bold text-white text-sm mb-1">Tanpa Biaya Langganan</h3>
-                <p class="text-xs text-slate-400">Sekali beli untuk pemakaian selamanya tanpa biaya tersembunyi.</p>
-            </div>
-        </div>
 
-        <div class="mt-4 flex flex-col sm:flex-row gap-4">
-            <a href="https://zenamagroup.com" target="_blank" class="bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm px-6 py-3 rounded-lg transition shadow-lg shadow-blue-500/20">
-                Pesan Kartu Wave Sekarang
-            </a>
-        </div>
-    </main>
+            <!-- CTA & PROMO CARD -->
+            <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="https://wa.me/62881036966171?text=Halo%20Admin%20ZenamaWave,%20saya%20mau%20pesan%20Papan%20Akrilik%20NFC%20Promo%2063k" 
+                   target="_blank" 
+                   class="w-full sm:w-auto inline-flex items-center justify-center space-x-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-8 py-3.5 rounded-2xl transition shadow-lg shadow-emerald-600/20 text-sm">
+                    <i class="fa-brands fa-whatsapp text-xl"></i>
+                    <span>Pesan via WhatsApp (Rp63.000)</span>
+                </a>
+                <a href="#cara-kerja" class="w-full sm:w-auto inline-flex items-center justify-center space-x-2 bg-white hover:bg-slate-100 text-slate-700 border border-gray-200 font-semibold px-6 py-3.5 rounded-2xl transition text-sm">
+                    <span>Pelajari Alur Pembelian</span>
+                    <i class="fa-solid fa-arrow-down text-xs"></i>
+                </a>
+            </div>
 
-    <!-- TAMPILAN 2: FORM AKTIVASI -->
+            <div class="pt-2 flex flex-wrap items-center justify-center gap-4 text-xs text-gray-500">
+                <span><i class="fa-solid fa-check-circle text-emerald-500 mr-1"></i> Tanpa Biaya Bulanan</span>
+                <span><i class="fa-solid fa-check-circle text-emerald-500 mr-1"></i> Fisik Akrilik Premium</span>
+                <span><i class="fa-solid fa-check-circle text-emerald-500 mr-1"></i> Dashboard Real-time</span>
+            </div>
+        </section>
+
+        <!-- ALUR PEMBELIAN S/D AKTIVASI -->
+        <section id="cara-kerja" class="py-16 bg-white border-y border-gray-200">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+                <div class="text-center space-y-2">
+                    <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">Bagaimana Cara Kerja & Pembeliannya?</h2>
+                    <p class="text-xs sm:text-sm text-gray-500">Proses sangat mudah dari pengiriman produk hingga kartu siap digunakan di toko Anda.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="p-6 bg-slate-50 rounded-2xl border border-gray-100 space-y-3 relative">
+                        <span class="w-8 h-8 bg-blue-600 text-white font-bold rounded-xl flex items-center justify-center text-xs">1</span>
+                        <h3 class="font-bold text-sm text-slate-900">Pesan via WhatsApp</h3>
+                        <p class="text-xs text-gray-500 leading-relaxed">
+                            Hubungi admin ZenamaWave via WhatsApp, isi data alamat pengiriman toko Anda, lalu selesaikan pembayaran promo sebesar <b>Rp63.000</b>.
+                        </p>
+                    </div>
+
+                    <div class="p-6 bg-slate-50 rounded-2xl border border-gray-100 space-y-3 relative">
+                        <span class="w-8 h-8 bg-blue-600 text-white font-bold rounded-xl flex items-center justify-center text-xs">2</span>
+                        <h3 class="font-bold text-sm text-slate-900">Pengiriman Paket</h3>
+                        <p class="text-xs text-gray-500 leading-relaxed">
+                            Kami mengirimkan papan akrilik fisik yang sudah dilengkapi chip NFC + QR Code beserta <b>Kode PIN Registrasi Fisik</b> unik di dalam paket.
+                        </p>
+                    </div>
+
+                    <div class="p-6 bg-slate-50 rounded-2xl border border-gray-100 space-y-3 relative">
+                        <span class="w-8 h-8 bg-blue-600 text-white font-bold rounded-xl flex items-center justify-center text-xs">3</span>
+                        <h3 class="font-bold text-sm text-slate-900">Registrasi Mandiri</h3>
+                        <p class="text-xs text-gray-500 leading-relaxed">
+                            Setibanya paket, scan/tap kartu tersebut untuk membuka halaman registrasi. Buat username, password, dan masukkan PIN fisik Anda.
+                        </p>
+                    </div>
+
+                    <div class="p-6 bg-slate-50 rounded-2xl border border-gray-100 space-y-3 relative">
+                        <span class="w-8 h-8 bg-emerald-600 text-white font-bold rounded-xl flex items-center justify-center text-xs">4</span>
+                        <h3 class="font-bold text-sm text-slate-900">Siap Panen Ulasan!</h3>
+                        <p class="text-xs text-gray-500 leading-relaxed">
+                            Masukkan tautan Google Maps bisnis Anda di dashboard. Papan akrilik langsung aktif dan siap dipajang di kasir atau meja toko!
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FITUR DASHBOARD & SHOWCASE GAMBAR DASHBOARD -->
+        <section id="fitur" class="py-16 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+            <div class="text-center space-y-2">
+                <span class="bg-emerald-50 text-emerald-600 border border-emerald-200 text-[10px] font-bold px-3 py-1 rounded-full uppercase">Sistem SaaS Canggih</span>
+                <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">Tampilan & Fitur Dashboard Admin</h2>
+                <p class="text-xs sm:text-sm text-gray-500">Pantau statistik ulasan, kelola link Google Review, dan unduh laporan bisnis Anda dengan mudah.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-4 rounded-3xl border border-gray-200 shadow-lg space-y-3">
+                    <div class="overflow-hidden rounded-2xl border border-gray-100">
+                        <img src="https://wave.zenamagroup.com/assets/dashboard-zenamawave.jpg" 
+                             alt="Dashboard Statistik ZenamaWave" 
+                             class="w-full h-auto object-cover hover:scale-105 transition duration-300">
+                    </div>
+                    <div class="p-2 space-y-1">
+                        <h3 class="font-bold text-sm text-slate-900">Statistik Real-Time & Grafik Interaksi</h3>
+                        <p class="text-xs text-gray-500">Pantau jumlah tap NFC dan scan QR secara akurat dilengkapi dengan laporan performa bulanan.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-3xl border border-gray-200 shadow-lg space-y-3">
+                    <div class="overflow-hidden rounded-2xl border border-gray-100">
+                        <img src="https://wave.zenamagroup.com/assets/dashboard-zenamawave-2.jpg" 
+                             alt="Pengaturan Akun ZenamaWave" 
+                             class="w-full h-auto object-cover hover:scale-105 transition duration-300">
+                    </div>
+                    <div class="p-2 space-y-1">
+                        <h3 class="font-bold text-sm text-slate-900">Kontrol Link Ulasan & Keamanan Account</h3>
+                        <p class="text-xs text-gray-500">Ubah URL Google Review toko kapan saja dan atur keamanan kredensial akun toko Anda.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-3">
+                    <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-lg font-bold">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-900 text-sm">Laporan Bulanan Real-Time</h3>
+                    <p class="text-xs text-gray-500 leading-relaxed">
+                        Sistem secara otomatis mencatat total interaksi Tap NFC & Scan QR secara presisi sejak tanggal dan detik kartu diaktivasi. Laporan bulanan dapat diunduh dalam format CSV.
+                    </p>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-3">
+                    <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-lg font-bold">
+                        <i class="fa-solid fa-link"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-900 text-sm">Ubah Tautan Review Kapan Saja</h3>
+                    <p class="text-xs text-gray-500 leading-relaxed">
+                        Pindah alamat toko atau ingin mengubah tautan ulasan? Anda dapat mengganti URL Google Review secara fleksibel melalui menu Pengaturan tanpa harus membeli kartu baru.
+                    </p>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-3">
+                    <div class="w-10 h-10 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center text-lg font-bold">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-900 text-sm">Keamanan Keanggotaan & PIN</h3>
+                    <p class="text-xs text-gray-500 leading-relaxed">
+                        Setiap aksi sensitif (seperti mengubah password admin) dilindungi dengan konfirmasi PIN Keamanan unik milik Anda, menjaga akun Anda aman dari akses tidak sah.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- PANDUAN PENGGUNAAN INTERAKTIF -->
+        <section id="panduan" class="py-16 bg-white border-y border-gray-200">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+                <div class="text-center space-y-2">
+                    <span class="bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-bold px-3 py-1 rounded-full uppercase">Panduan Website ZenamaWave</span>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">Panduan Operasional Penggunaan</h2>
+                    <p class="text-xs sm:text-sm text-gray-500">Petunjuk praktis untuk pelanggan dan panduan staf kasir untuk memaksimalkan ulasan.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="p-6 rounded-2xl bg-slate-50 border border-gray-200 space-y-4">
+                        <h3 class="font-bold text-slate-900 text-sm border-b border-gray-200 pb-3 flex items-center space-x-2">
+                            <i class="fa-solid fa-users text-blue-600"></i>
+                            <span>Cara Interaksi Pelanggan (NFC & QR)</span>
+                        </h3>
+                        
+                        <div class="space-y-3 text-xs text-slate-700">
+                            <div class="flex items-start space-x-3">
+                                <span class="bg-blue-100 text-blue-700 p-2 rounded-lg font-bold"><i class="fa-solid fa-wifi"></i></span>
+                                <div>
+                                    <p class="font-bold text-slate-900">A. Metode NFC Tap (HP iPhone & Android ber-NFC)</p>
+                                    <p class="text-gray-500 mt-0.5">Pelanggan cukup menempelkan bagian belakang HP ke simbol TAP di papan akrilik. Notifikasi tautan ulasan akan langsung muncul di layar HP.</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start space-x-3 pt-2">
+                                <span class="bg-emerald-100 text-emerald-700 p-2 rounded-lg font-bold"><i class="fa-solid fa-qrcode"></i></span>
+                                <div>
+                                    <p class="font-bold text-slate-900">B. Metode QR Scan (Kamera HP / WA)</p>
+                                    <p class="text-gray-500 mt-0.5">Pelanggan membuka aplikasi Kamera atau WhatsApp, lalu mengarahkan ke QR Code di papan akrilik untuk membuka link review.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-6 rounded-2xl bg-slate-50 border border-gray-200 space-y-4">
+                        <h3 class="font-bold text-slate-900 text-sm border-b border-gray-200 pb-3 flex items-center space-x-2">
+                            <i class="fa-solid fa-user-tie text-emerald-600"></i>
+                            <span>Trik Operasional Kasir & Staff</span>
+                        </h3>
+
+                        <ul class="space-y-3 text-xs text-slate-700">
+                            <li class="flex items-start space-x-2.5">
+                                <i class="fa-solid fa-location-dot text-blue-600 mt-1"></i>
+                                <span><b>Posisi Strategis:</b> Letakkan papan akrilik tepat di samping mesin EDC/Kasir atau meja makan yang sering ditempati pelanggan.</span>
+                            </li>
+                            <li class="flex items-start space-x-2.5">
+                                <i class="fa-solid fa-comments text-amber-500 mt-1"></i>
+                                <span><b>Kalimat Ajakan Kasir:</b> "Kak, bantu ulas toko kami di Google ya! Tinggal tempel HP ke papan ini, cuma 5 detik kok Kak. Terima kasih banyak!"</span>
+                            </li>
+                            <li class="flex items-start space-x-2.5">
+                                <i class="fa-solid fa-gift text-emerald-500 mt-1"></i>
+                                <span><b>Inisiatif Promo:</b> Berikan apresiasi kecil seperti gratis voucher/diskon 5% untuk pelanggan yang memperlihatkan ulasan Bintang 5 di layar HP-nya.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- HARGA PROMO & CTA BANNER -->
+        <section id="harga" class="py-16 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white p-8 sm:p-12 rounded-3xl shadow-xl text-center space-y-6 relative overflow-hidden">
+                <div class="space-y-2">
+                    <span class="bg-rose-500 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">Penawaran Terbatas</span>
+                    <h2 class="text-2xl sm:text-4xl font-extrabold">Dapatkan Papan Akrilik Smart Review Hari Ini</h2>
+                </div>
+
+                <div class="py-2">
+                    <span class="text-gray-400 line-through text-lg block">Rp150.000</span>
+                    <span class="text-4xl sm:text-6xl font-black text-emerald-400">Rp63.000</span>
+                    <span class="text-xs text-gray-300 block mt-1">*Sudah termasuk Papan Akrilik NFC + QR, Kode PIN Registrasi, dan Akses Dashboard Sistem</span>
+                </div>
+
+                <div>
+                    <a href="https://wa.me/62881036966171?text=Halo%20Admin%20ZenamaWave,%20saya%20mau%20pesan%20Papan%20Akrilik%20NFC%20Promo%2063k" 
+                       target="_blank" 
+                       class="inline-flex items-center space-x-3 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold px-8 py-4 rounded-2xl transition shadow-lg text-sm sm:text-base">
+                        <i class="fa-brands fa-whatsapp text-2xl"></i>
+                        <span>Pesan Sekarang via WhatsApp</span>
+                    </a>
+                </div>
+                
+                <p class="text-[11px] text-gray-400">Pesan langsung diproses oleh Tim Support ZenamaWave</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- TAMPILAN 2: FORM AKTIVASI (Tetap Berfungsi Ketika Kartu Dideteksi) -->
     <main id="activationSection" class="hidden max-w-md mx-auto px-4 py-8 flex-1 w-full flex flex-col justify-center">
-        <div class="bg-slate-800/80 p-6 rounded-2xl border border-slate-700/60 shadow-2xl backdrop-blur">
+        <div class="bg-slate-900 text-slate-100 p-6 rounded-2xl border border-slate-700/60 shadow-2xl">
             <div class="text-center mb-6">
                 <div class="flex justify-center items-center gap-1 text-2xl font-black mb-1">
                     <span class="text-blue-500">G</span><span class="text-red-500">o</span><span class="text-yellow-500">o</span><span class="text-blue-500">g</span><span class="text-green-500">l</span><span class="text-red-500">e</span>
@@ -71,8 +298,8 @@
                 <p class="text-xs text-slate-400">Aktivasi Smart NFC Card Milikmu</p>
             </div>
 
-            <div class="bg-slate-900/80 border border-slate-700 rounded-lg p-3 mb-6 text-center relative">
-                <span id="sourceBadge" class="absolute top-2 right-2 text-[9px] px-2 py-0.5 rounded font-mono uppercase bg-slate-800 text-slate-400 border border-slate-700">SRC: -</span>
+            <div class="bg-slate-800/80 border border-slate-700 rounded-lg p-3 mb-6 text-center relative">
+                <span id="sourceBadge" class="absolute top-2 right-2 text-[9px] px-2 py-0.5 rounded font-mono uppercase bg-slate-900 text-slate-400 border border-slate-700">SRC: -</span>
                 <span class="text-[10px] text-blue-400 block font-semibold tracking-wider uppercase mb-1">ID SERI KARTU DETEKSI</span>
                 <span id="displayId" class="text-lg font-bold text-white font-mono tracking-widest">-</span>
             </div>
@@ -80,28 +307,28 @@
             <form id="activationForm" class="space-y-3">
                 <div>
                     <label class="block text-[11px] font-semibold text-slate-300 mb-1">8 DIGIT PIN DEFAULT</label>
-                    <input type="text" id="pin" maxlength="8" class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-lg font-mono text-center text-lg font-bold tracking-widest text-blue-400 focus:outline-none focus:border-blue-500" placeholder="12345678" required>
+                    <input type="text" id="pin" maxlength="8" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg font-mono text-center text-lg font-bold tracking-widest text-blue-400 focus:outline-none focus:border-blue-500" placeholder="12345678" required>
                 </div>
 
                 <div class="pt-2 border-t border-slate-700/50 space-y-3">
                     <div>
                         <label class="block text-[11px] font-semibold text-slate-300 mb-1">NAMA BISNIS / PEMILIK</label>
-                        <input type="text" id="namaPemilik" class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-blue-500" placeholder="Contoh: Kopi Zenama" required>
+                        <input type="text" id="namaPemilik" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-blue-500" placeholder="Contoh: Kopi Zenama" required>
                     </div>
 
                     <div>
                         <label class="block text-[11px] font-semibold text-slate-300 mb-1">NO. WHATSAPP</label>
-                        <input type="tel" id="noHp" class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-blue-500" placeholder="08123456789" required>
+                        <input type="tel" id="noHp" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-blue-500" placeholder="08123456789" required>
                     </div>
 
                     <div>
                         <label class="block text-[11px] font-semibold text-slate-300 mb-1">BUAT PASSWORD LOGIN BARU</label>
-                        <input type="password" id="password" class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-blue-500" placeholder="Password rahasia kamu" required>
+                        <input type="password" id="password" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-blue-500" placeholder="Password rahasia kamu" required>
                     </div>
 
                     <div>
                         <label class="block text-[11px] font-semibold text-slate-300 mb-1">LINK GOOGLE REVIEW BISNIS</label>
-                        <input type="url" id="reviewUrl" class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-blue-500" placeholder="https://g.page/r/xxxx/review" required>
+                        <input type="url" id="reviewUrl" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-blue-500" placeholder="https://g.page/r/xxxx/review" required>
                     </div>
                 </div>
 
@@ -114,10 +341,39 @@
         </div>
     </main>
 
-    <footer class="border-t border-slate-800 text-center py-4 text-xs text-slate-500">
-        &copy; 2026 Zenama Group. All rights reserved.
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-gray-200 py-10 text-xs text-gray-600 mt-auto">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 text-center">
+            
+            <div class="max-w-2xl mx-auto space-y-2">
+                <span class="font-extrabold text-lg tracking-tight">
+                    <span class="text-blue-600">Zenama</span><span class="text-emerald-500">Wave</span>
+                </span>
+                <p class="text-gray-500 leading-relaxed">
+                    ZenamaWave adalah startup teknologi yang dikembangkan di bawah <b>Zenama Group Indonesia</b> yang membangun produk SaaS <i>(Software as a Service)</i> untuk memberikan solusi pertumbuhan bisnis secara efektif.
+                </p>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-center gap-6 text-xs font-semibold text-gray-700 pt-2 border-t border-gray-100">
+                <a href="https://wa.me/62881036966171" target="_blank" class="hover:text-emerald-600 transition flex items-center space-x-1.5">
+                    <i class="fa-brands fa-whatsapp text-emerald-500 text-sm"></i>
+                    <span>0881036966171</span>
+                </a>
+                <a href="mailto:wave@zenamagroup.com" class="hover:text-blue-600 transition flex items-center space-x-1.5">
+                    <i class="fa-solid fa-envelope text-blue-500 text-sm"></i>
+                    <span>wave@zenamagroup.com</span>
+                </a>
+            </div>
+
+            <div class="text-[11px] text-gray-400 pt-4 border-t border-gray-100 space-y-1">
+                <p>©2026 ZenamaWave - All Rights Reserved.</p>
+                <p>SaaS Technology developed by <a href="https://zenamagroup.com" target="_blank" class="text-blue-600 font-semibold hover:underline">Zenama Group Indonesia</a>.</p>
+            </div>
+
+        </div>
     </footer>
 
+    <!-- SCRIPT LOGIKA UTAMA (TIDAK ADA YANG DIUBAH) -->
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const cardId = urlParams.get('id');
