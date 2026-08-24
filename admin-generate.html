@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Generate Kartu Wave</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-white min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-slate-800 p-6 rounded-2xl shadow-xl w-full max-w-md border border-slate-700">
+        <h1 class="text-xl font-bold text-center text-blue-400 mb-1">Admin Panel Wave</h1>
+        <p class="text-xs text-center text-slate-400 mb-6">Generate ID Seri & PIN Otomatis untuk Cetak Kartu</p>
+
+        <form id="generateForm" class="space-y-4">
+            <div>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">ID SERI KARTU (8 KARAKTER)</label>
+                <div class="flex gap-2">
+                    <input type="text" id="idSeri" class="w-full p-3 bg-slate-700 border border-slate-600 rounded-lg text-white font-mono uppercase font-bold tracking-wider" readonly required placeholder="Klik Generate">
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">PIN DEFAULT (8 DIGIT)</label>
+                <input type="text" id="pin" class="w-full p-3 bg-slate-700 border border-slate-600 rounded-lg text-white font-mono font-bold tracking-wider" readonly required placeholder="Klik Generate">
+            </div>
+
+            <button type="button" id="btnRandom" class="w-full bg-slate-700 hover:bg-slate-600 border border-slate-500 text-sm font-semibold py-2 rounded-lg transition">
+                🎲 Acak ID & PIN Baru
+            </button>
+
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg transition shadow-lg mt-2">
+                Simpan ke Database KV
+            </button>
+        </form>
+
+        <div id="statusMsg" class="mt-4 p-3 rounded-lg hidden text-xs font-semibold text-center"></div>
+    </div>
+
+    <script>
+        // Fungsi membuat ID Seri acak (8 Karakter Huruf & Angka)
+        function makeId(length) {
+            let result = '';
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            for (let i = 0; i < length; i++) {
+                result += characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+            return result;
+        }
+
+        // Fungsi membuat PIN acak (8 Digit Angka)
+        function makePin(length) {
+            let result = '';
+            const characters = '0123456789';
+            for (let i = 0; i < length; i++) {
+                result += characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+            return result;
+        }
+
+        function generateRandomData() {
+            document.getElementById('idSeri').value = makeId(8);
+            document.getElementById('pin').value = makePin(8);
+        }
+
+        // Generate otomatis saat pertama dibuka
+        generateRandomData();
+
+        document.getElementById('btnRandom').addEventListener('click', generateRandomData);
+
+        document.getElementById('generateForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const idSeri = document.getElementById('idSeri').value;
+            const pin = document.getElementById('pin').value;
+            const statusMsg = document.getElementById('statusMsg');
+
+            statusMsg.className = "mt-4 p-3 rounded-lg text-xs font-semibold text-center bg-yellow-600 text-white block";
+            statusMsg.innerText = "Menyimpan data ke Cloudflare KV...";
+
+            try {
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ idSeri, pin })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    statusMsg.className = "mt-4 p-3 rounded-lg text-xs font-semibold text-center bg-green-600 text-white block";
+                    statusMsg.innerText = `Berhasil! ID: ${idSeri} | PIN: ${pin}`;
+                    generateRandomData(); // Siapkan untuk generate berikutnya
+                } else {
+                    statusMsg.className = "mt-4 p-3 rounded-lg text-xs font-semibold text-center bg-red-600 text-white block";
+                    statusMsg.innerText = result.message;
+                }
+            } catch (err) {
+                statusMsg.className = "mt-4 p-3 rounded-lg text-xs font-semibold text-center bg-red-600 text-white block";
+                statusMsg.innerText = "Gagal terhubung ke API Server.";
+            }
+        });
+    </script>
+</body>
+      </html>
+
