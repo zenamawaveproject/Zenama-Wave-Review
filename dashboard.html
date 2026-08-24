@@ -362,7 +362,7 @@
 
                     <button id="downloadQrBtn" onclick="downloadQR()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-xs transition shadow-md shadow-emerald-500/20 flex items-center justify-center space-x-2">
                         <i class="fa-solid fa-download text-sm"></i>
-                        <span>Unduh Gambar QR Code</span>
+                        <span>Unduh Gambar QR Code (.png)</span>
                     </button>
                 </div>
             </div>
@@ -612,13 +612,20 @@
             const formattedActDate = `${actDate.getDate()} ${namaBulanIndo[actDate.getMonth() + 1]} ${actDate.getFullYear()} ${String(actDate.getHours()).padStart(2, '0')}:${String(actDate.getMinutes()).padStart(2, '0')}:${String(actDate.getSeconds()).padStart(2, '0')} WIB`;
             document.getElementById('activatedFormattedText').innerHTML = `<i class="fa-solid fa-bolt text-amber-500 mr-1"></i> ${formattedActDate}`;
 
-            // --- PERBAIKAN GENERATE QR CODE SESUAI ID SERI ---
+            // --- PEMBARUAN: RENDER KODE QR DARI BASE64 KV ---
             const userQrUrl = `https://cards.zenamagroup.com/?id=${encodeURIComponent(data.idSeri)}&src=qr`;
-            const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(userQrUrl)}`;
             
             document.getElementById('qrBadgeTitle').innerText = `${clientName} (${data.idSeri})`;
-            document.getElementById('qrImage').src = qrApiUrl;
             document.getElementById('qrUrlDisplay').innerText = userQrUrl;
+            
+            // Menggunakan Base64 gambar dari KV jika tersedia
+            if (data.qr_code_base64) {
+                document.getElementById('qrImage').src = data.qr_code_base64;
+            } else {
+                // Fallback cadangan jika data Base64 lama belum ada
+                const fallbackQr = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(userQrUrl)}`;
+                document.getElementById('qrImage').src = fallbackQr;
+            }
             // --------------------------------------------------
 
             // Settings Fields
@@ -801,22 +808,29 @@
             }
         });
 
-        // 7. UTILS & NAVIGATION
+        // 7. PEMBARUAN: FUNGSI UNDUH GAMBAR QR DARI BASE64 KV
         function downloadQR() {
-            const qrImg = document.getElementById('qrImage').src;
-            if (!qrImg) return;
-            fetch(qrImg)
-                .then(response => response.blob())
-                .then(blob => {
-                    const blobUrl = URL.createObjectURL(blob);
-                    const link = document.createElement('a');
-                    link.href = blobUrl;
-                    link.download = `QRCode_${cardId}.png`;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                })
-                .catch(() => alert('Gagal mengunduh gambar QR Code.'));
+            if (!globalCardData || !globalCardData.qr_code_base64) {
+                const qrImgSrc = document.getElementById('qrImage').src;
+                if (!qrImgSrc) return alert('Gambar QR Code tidak tersedia.');
+                
+                // Fallback unduh jika data base64 belum ada
+                const link = document.createElement('a');
+                link.href = qrImgSrc;
+                link.download = `${cardId}.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                return;
+            }
+
+            // Mengunduh langsung dari string Base64 yang tersimpan di KV
+            const link = document.createElement('a');
+            link.href = globalCardData.qr_code_base64;
+            link.download = `${cardId}.png`; // Menghasilkan file IDXNCYQS.png
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         function confirmLogout() {
