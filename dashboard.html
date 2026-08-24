@@ -3,111 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Kartu - Wave</title>
+    <title>Dashboard Kartu - Wave by Zenama</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 text-gray-800 min-h-screen p-4 flex justify-center items-center">
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between">
 
-    <div class="bg-white p-6 rounded-2xl shadow-xl w-full max-w-lg">
-        <div class="flex items-center justify-between border-b pb-4 mb-6">
-            <div>
-                <h1 class="text-xl font-bold text-gray-800">Dashboard Wave</h1>
-                <p class="text-xs text-gray-500">Kelola kartu Google Review Anda</p>
+    <nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <span class="text-xl font-extrabold bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">WAVE</span>
+                <span class="text-xs text-slate-400">Dashboard</span>
             </div>
-            <span class="bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full font-bold">AKTIF</span>
+            <button id="logoutBtn" class="text-xs bg-red-600/20 hover:bg-red-600/30 text-red-400 px-3 py-1.5 rounded border border-red-500/30 font-semibold transition">
+                Keluar
+            </button>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-4 py-8 flex-1 w-full space-y-6">
+        
+        <!-- Header Info Klien -->
+        <div class="bg-slate-800/80 p-6 rounded-2xl border border-slate-700/60 shadow-xl backdrop-blur flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <span class="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded font-mono font-bold uppercase border border-blue-500/30">ID SERI: <span id="displayCardId">-</span></span>
+                <h1 id="displayClientName" class="text-2xl font-black text-white mt-1">Memuat Nama Bisnis...</h1>
+                <p class="text-xs text-slate-400 mt-0.5">Aktif Sejak: <span id="displayActivatedAt" class="text-slate-300 font-mono">-</span></p>
+            </div>
         </div>
 
-        <div class="space-y-4">
-            <!-- Info ID Seri -->
-            <div class="bg-blue-50 p-3 rounded-lg border border-blue-100 flex justify-between items-center">
-                <span class="text-xs font-semibold text-blue-600">ID SERI KARTU:</span>
-                <span id="dashCardId" class="text-base font-bold text-blue-900 tracking-wider">Memuat...</span>
+        <!-- Ringkasan Statistik Scan/Tap -->
+        <div class="grid grid-cols-2 gap-4">
+            <div class="bg-slate-800/50 p-5 rounded-xl border border-slate-700/50 text-center">
+                <span class="text-3xl font-black text-blue-400 block mb-1" id="statQr">0</span>
+                <span class="text-xs text-slate-400 font-semibold">Total Scan QR</span>
             </div>
+            <div class="bg-slate-800/50 p-5 rounded-xl border border-slate-700/50 text-center">
+                <span class="text-3xl font-black text-indigo-400 block mb-1" id="statTap">0</span>
+                <span class="text-xs text-slate-400 font-semibold">Total Tap NFC</span>
+            </div>
+        </div>
 
-            <!-- Form Set/Edit Link Google Review -->
-            <form id="saveLinkForm" class="space-y-3 pt-2">
+        <!-- Form Update Link Google Review -->
+        <div class="bg-slate-800/80 p-6 rounded-2xl border border-slate-700/60 shadow-xl">
+            <h2 class="text-sm font-bold text-white mb-1">Pengaturan Link Google Review</h2>
+            <p class="text-xs text-slate-400 mb-4">Ubah link tujuan pelanggan saat kartu di-tap atau di-scan.</p>
+
+            <form id="updateLinkForm" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">LINK GOOGLE REVIEW BISNIS</label>
-                    <input type="url" id="reviewUrl" class="w-full p-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="https://g.page/r/xxxxx/review" required>
-                    <p class="text-[10px] text-gray-400 mt-1">*Masukkan link tujuan saat kartu ini di-tap atau di-scan pelanggan.</p>
+                    <label class="block text-[11px] font-semibold text-slate-300 mb-1">LINK GOOGLE REVIEW AKTIF</label>
+                    <input type="url" id="reviewUrlInput" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-blue-500" placeholder="https://g.page/r/xxxx/review" required>
                 </div>
 
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition shadow">
-                    Simpan Link Review
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg transition text-xs shadow-lg shadow-blue-600/20">
+                    Simpan Perubahan Link
                 </button>
             </form>
-
-            <div id="dashMsg" class="p-3 rounded-lg hidden text-xs font-semibold text-center"></div>
-
-            <div class="pt-4 border-t flex justify-between items-center">
-                <button id="logoutBtn" class="text-xs text-red-500 font-semibold hover:underline">Keluar (Logout)</button>
-            </div>
+            <div id="statusMsg" class="mt-4 p-3 rounded-lg hidden text-xs font-semibold text-center"></div>
         </div>
-    </div>
+    </main>
+
+    <footer class="border-t border-slate-800 text-center py-4 text-xs text-slate-500">
+        &copy; 2026 Zenama Group. All rights reserved.
+    </footer>
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const cardId = urlParams.get('id') || localStorage.getItem('wave_card_id');
-        const dashMsg = document.getElementById('dashMsg');
 
-        // Proteksi: Jika tidak ada ID Seri, lempar ke halaman login
         if (!cardId) {
             window.location.href = '/login.html';
-        } else {
-            document.getElementById('dashCardId').innerText = cardId;
-            loadCardData();
         }
 
-        // 1. Ambil data link dari Cloudflare KV via API
-        async function loadCardData() {
+        // Load data dashboard dari Cloudflare Functions
+        async function loadDashboardData() {
             try {
                 const res = await fetch(`/api/dashboard?id=${cardId}`);
                 const data = await res.json();
 
-                if (data.success && data.reviewUrl) {
-                    document.getElementById('reviewUrl').value = data.reviewUrl;
+                if (data.success) {
+                    document.getElementById('displayCardId').innerText = data.idSeri;
+                    document.getElementById('displayClientName').innerText = data.client_name || 'Pelanggan Wave';
+                    document.getElementById('displayActivatedAt').innerText = data.activated_at || '-';
+                    document.getElementById('reviewUrlInput').value = data.google_review_url || '';
+                    document.getElementById('statQr').innerText = data.stats?.total_qr || 0;
+                    document.getElementById('statTap').innerText = data.stats?.total_tap || 0;
+                } else {
+                    alert(data.message);
+                    window.location.href = '/login.html';
                 }
-            } catch (err) {
-                console.error("Gagal mengambil data:", err);
+            } catch (e) {
+                console.error("Gagal memuat data dashboard:", e);
             }
         }
 
-        // 2. Simpan Link Google Review baru
-        document.getElementById('saveLinkForm').addEventListener('submit', async (e) => {
+        // Simpan Perubahan Link
+        document.getElementById('updateLinkForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const reviewUrl = document.getElementById('reviewUrl').value.trim();
+            const newUrl = document.getElementById('reviewUrlInput').value.trim();
+            const statusMsg = document.getElementById('statusMsg');
 
-            dashMsg.className = "p-3 rounded-lg text-xs font-semibold text-center bg-yellow-100 text-yellow-800 block";
-            dashMsg.innerText = "Menyimpan link baru...";
+            statusMsg.className = "mt-4 p-3 rounded-lg text-xs font-semibold text-center bg-yellow-600/20 text-yellow-400 border border-yellow-500/30 block";
+            statusMsg.innerText = "Menyimpan link baru...";
 
             try {
                 const res = await fetch('/api/dashboard', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ idSeri: cardId, reviewUrl })
+                    body: JSON.stringify({ idSeri: cardId, reviewUrl: newUrl })
                 });
-
                 const result = await res.json();
 
                 if (result.success) {
-                    dashMsg.className = "p-3 rounded-lg text-xs font-semibold text-center bg-green-100 text-green-800 block";
-                    dashMsg.innerText = result.message;
+                    statusMsg.className = "mt-4 p-3 rounded-lg text-xs font-semibold text-center bg-green-600/20 text-green-400 border border-green-500/30 block";
+                    statusMsg.innerText = result.message;
                 } else {
-                    dashMsg.className = "p-3 rounded-lg text-xs font-semibold text-center bg-red-100 text-red-800 block";
-                    dashMsg.innerText = result.message;
+                    statusMsg.className = "mt-4 p-3 rounded-lg text-xs font-semibold text-center bg-red-600/20 text-red-400 border border-red-500/30 block";
+                    statusMsg.innerText = result.message;
                 }
             } catch (err) {
-                dashMsg.className = "p-3 rounded-lg text-xs font-semibold text-center bg-red-100 text-red-800 block";
-                dashMsg.innerText = "Gagal menyimpan link.";
+                statusMsg.className = "mt-4 p-3 rounded-lg text-xs font-semibold text-center bg-red-600/20 text-red-400 border border-red-500/30 block";
+                statusMsg.innerText = "Terjadi kesalahan jaringan.";
             }
         });
 
-        // 3. Fitur Logout
+        // Logout
         document.getElementById('logoutBtn').addEventListener('click', () => {
             localStorage.removeItem('wave_card_id');
-            localStorage.removeItem('wave_auth_token');
             window.location.href = '/login.html';
         });
+
+        loadDashboardData();
     </script>
 </body>
 </html>
