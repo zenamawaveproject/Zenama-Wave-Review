@@ -8,16 +8,45 @@
 </head>
 <body class="bg-slate-900 text-white min-h-screen flex items-center justify-center p-4">
 
-    <div class="bg-slate-800 p-6 rounded-2xl shadow-xl w-full max-w-md border border-slate-700">
-        <h1 class="text-xl font-bold text-center text-blue-400 mb-1">Admin Panel Wave</h1>
-        <p class="text-xs text-center text-slate-400 mb-6">Generate ID Seri & PIN Otomatis untuk Cetak Kartu</p>
+    <!-- MODAL LOGIN ADMIN -->
+    <div id="adminLoginModal" class="bg-slate-800 p-6 rounded-2xl shadow-2xl w-full max-w-sm border border-slate-700">
+        <div class="text-center mb-6">
+            <h1 class="text-xl font-extrabold text-blue-400">🔒 Admin Gate</h1>
+            <p class="text-xs text-slate-400 mt-1">Masukkan Autentikasi Admin Wave</p>
+        </div>
+
+        <form id="adminLoginForm" class="space-y-3">
+            <div>
+                <label class="block text-[10px] font-semibold text-slate-400 mb-1">USERNAME ADMIN</label>
+                <input type="text" id="adminUsername" class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white text-xs focus:outline-none focus:border-blue-500" placeholder="Username" required>
+            </div>
+            <div>
+                <label class="block text-[10px] font-semibold text-slate-400 mb-1">PASSWORD ADMIN</label>
+                <input type="password" id="adminPassword" class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white text-xs focus:outline-none focus:border-blue-500" placeholder="Password" required>
+            </div>
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-lg transition text-xs shadow-lg mt-2">
+                Masuk Ke Panel Admin
+            </button>
+        </form>
+        <div id="loginMsg" class="mt-4 p-2.5 rounded-lg hidden text-xs font-semibold text-center"></div>
+    </div>
+
+    <!-- PANEL GENERATE (Hanya tampil jika sudah login) -->
+    <div id="generatorPanel" class="hidden bg-slate-800 p-6 rounded-2xl shadow-xl w-full max-w-md border border-slate-700">
+        <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-700">
+            <div>
+                <h1 class="text-lg font-bold text-blue-400">Admin Panel Wave</h1>
+                <p class="text-[10px] text-slate-400">Generate ID Seri & PIN Otomatis untuk Cetak Kartu</p>
+            </div>
+            <button id="btnLogoutAdmin" class="text-[10px] bg-red-500/10 text-red-400 hover:bg-red-500/20 px-2.5 py-1 rounded border border-red-500/30">
+                Logout
+            </button>
+        </div>
 
         <form id="generateForm" class="space-y-4">
             <div>
                 <label class="block text-xs font-semibold text-slate-300 mb-1">ID SERI KARTU (8 KARAKTER)</label>
-                <div class="flex gap-2">
-                    <input type="text" id="idSeri" class="w-full p-3 bg-slate-700 border border-slate-600 rounded-lg text-white font-mono uppercase font-bold tracking-wider" readonly required placeholder="Klik Generate">
-                </div>
+                <input type="text" id="idSeri" class="w-full p-3 bg-slate-700 border border-slate-600 rounded-lg text-white font-mono uppercase font-bold tracking-wider" readonly required placeholder="Klik Generate">
             </div>
             <div>
                 <label class="block text-xs font-semibold text-slate-300 mb-1">PIN DEFAULT (8 DIGIT)</label>
@@ -28,16 +57,79 @@
                 🎲 Acak ID & PIN Baru
             </button>
 
-            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg transition shadow-lg mt-2">
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg transition shadow-lg mt-2 text-xs">
                 Simpan ke Database KV
             </button>
         </form>
+
+        <!-- OUTPUT LINK SIAP CETAK -->
+        <div id="resultBox" class="mt-6 space-y-3 hidden bg-slate-900/80 p-4 rounded-xl border border-slate-700">
+            <span class="text-[11px] font-bold text-emerald-400 block border-b border-slate-800 pb-2">✅ DATA BERHASIL DISIMPAN KE KV</span>
+            <div>
+                <span class="text-[10px] text-slate-500 block">LINK NFC (TAP):</span>
+                <input type="text" id="linkTap" class="w-full bg-slate-800 border border-slate-700 p-2 rounded text-xs text-slate-300 font-mono" readonly>
+            </div>
+            <div>
+                <span class="text-[10px] text-slate-500 block">LINK QR CODE:</span>
+                <input type="text" id="linkQr" class="w-full bg-slate-800 border border-slate-700 p-2 rounded text-xs text-slate-300 font-mono" readonly>
+            </div>
+        </div>
 
         <div id="statusMsg" class="mt-4 p-3 rounded-lg hidden text-xs font-semibold text-center"></div>
     </div>
 
     <script>
-        // Fungsi membuat ID Seri acak (8 Karakter Huruf & Angka)
+        const adminLoginModal = document.getElementById('adminLoginModal');
+        const generatorPanel = document.getElementById('generatorPanel');
+        const loginMsg = document.getElementById('loginMsg');
+
+        // Check Sesi Admin
+        if (sessionStorage.getItem('wave_admin_token')) {
+            adminLoginModal.classList.add('hidden');
+            generatorPanel.classList.remove('hidden');
+            generateRandomData();
+        }
+
+        // Handle Login Admin
+        document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('adminUsername').value.trim();
+            const password = document.getElementById('adminPassword').value.trim();
+
+            loginMsg.className = "mt-4 p-2.5 rounded-lg text-xs font-semibold text-center bg-yellow-600/20 text-yellow-400 border border-yellow-500/30 block";
+            loginMsg.innerText = "Memverifikasi...";
+
+            try {
+                const response = await fetch('/api/admin-login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    sessionStorage.setItem('wave_admin_token', result.token);
+                    adminLoginModal.classList.add('hidden');
+                    generatorPanel.classList.remove('hidden');
+                    generateRandomData();
+                } else {
+                    loginMsg.className = "mt-4 p-2.5 rounded-lg text-xs font-semibold text-center bg-red-600/20 text-red-400 border border-red-500/30 block";
+                    loginMsg.innerText = result.message;
+                }
+            } catch (err) {
+                loginMsg.className = "mt-4 p-2.5 rounded-lg text-xs font-semibold text-center bg-red-600/20 text-red-400 border border-red-500/30 block";
+                loginMsg.innerText = "Gagal memverifikasi login.";
+            }
+        });
+
+        // Logout
+        document.getElementById('btnLogoutAdmin').addEventListener('click', () => {
+            sessionStorage.removeItem('wave_admin_token');
+            location.reload();
+        });
+
+        // Helper Random
         function makeId(length) {
             let result = '';
             const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -47,7 +139,6 @@
             return result;
         }
 
-        // Fungsi membuat PIN acak (8 Digit Angka)
         function makePin(length) {
             let result = '';
             const characters = '0123456789';
@@ -60,18 +151,18 @@
         function generateRandomData() {
             document.getElementById('idSeri').value = makeId(8);
             document.getElementById('pin').value = makePin(8);
+            document.getElementById('resultBox').classList.add('hidden');
         }
-
-        // Generate otomatis saat pertama dibuka
-        generateRandomData();
 
         document.getElementById('btnRandom').addEventListener('click', generateRandomData);
 
+        // Submit Form Generate Ke KV
         document.getElementById('generateForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const idSeri = document.getElementById('idSeri').value;
             const pin = document.getElementById('pin').value;
             const statusMsg = document.getElementById('statusMsg');
+            const resultBox = document.getElementById('resultBox');
 
             statusMsg.className = "mt-4 p-3 rounded-lg text-xs font-semibold text-center bg-yellow-600 text-white block";
             statusMsg.innerText = "Menyimpan data ke Cloudflare KV...";
@@ -87,8 +178,13 @@
 
                 if (result.success) {
                     statusMsg.className = "mt-4 p-3 rounded-lg text-xs font-semibold text-center bg-green-600 text-white block";
-                    statusMsg.innerText = `Berhasil! ID: ${idSeri} | PIN: ${pin}`;
-                    generateRandomData(); // Siapkan untuk generate berikutnya
+                    statusMsg.innerText = result.message;
+
+                    // Tampilkan Link Siap Cetak
+                    document.getElementById('linkTap').value = `https://wave.zenamagroup.com/?id=${idSeri}&src=tap`;
+                    document.getElementById('linkQr').value = `https://wave.zenamagroup.com/?id=${idSeri}&src=qr`;
+                    resultBox.classList.remove('hidden');
+
                 } else {
                     statusMsg.className = "mt-4 p-3 rounded-lg text-xs font-semibold text-center bg-red-600 text-white block";
                     statusMsg.innerText = result.message;
@@ -100,5 +196,4 @@
         });
     </script>
 </body>
-      </html>
-
+</html>
