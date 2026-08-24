@@ -64,14 +64,14 @@
 
         <!-- OUTPUT LINK & KODE QR SIAP CETAK -->
         <div id="resultBox" class="mt-6 space-y-4 hidden bg-slate-900/80 p-4 rounded-xl border border-slate-700">
-            <span class="text-[11px] font-bold text-emerald-400 block border-b border-slate-800 pb-2">✅ DATA BERHASIL DISIMPAN KE KV</span>
+            <span class="text-[11px] font-bold text-emerald-400 block border-b border-slate-800 pb-2">✅ DATA & QR CODE BERHASIL DISIMPAN KE KV</span>
             
             <!-- TAMPILAN GAMBAR QR CODE & BUTTON DOWNLOAD -->
             <div class="flex flex-col items-center justify-center p-3 bg-white rounded-lg border border-slate-700">
                 <img id="qrImage" src="" alt="QR Code" class="w-36 h-36 border border-slate-200 p-1 bg-white rounded">
-                <a id="btnDownloadQr" href="" download="" target="_blank" class="mt-3 text-[11px] bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg font-bold transition shadow-md flex items-center space-x-1.5">
+                <button type="button" id="btnDownloadQr" onclick="downloadAdminQR()" class="mt-3 text-[11px] bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg font-bold transition shadow-md flex items-center space-x-1.5 cursor-pointer">
                     <span>⬇️ Download QR Code (.png)</span>
-                </a>
+                </button>
             </div>
 
             <div>
@@ -91,6 +91,9 @@
         const adminLoginModal = document.getElementById('adminLoginModal');
         const generatorPanel = document.getElementById('generatorPanel');
         const loginMsg = document.getElementById('loginMsg');
+
+        let currentBase64Image = '';
+        let currentFilename = '';
 
         // Check Sesi Admin
         if (sessionStorage.getItem('wave_admin_token')) {
@@ -161,11 +164,13 @@
             document.getElementById('idSeri').value = makeId(8);
             document.getElementById('pin').value = makePin(8);
             document.getElementById('resultBox').classList.add('hidden');
+            currentBase64Image = '';
+            currentFilename = '';
         }
 
         document.getElementById('btnRandom').addEventListener('click', generateRandomData);
 
-        // Submit Form Generate Ke KV
+        // Submit Form Generate Ke KV (Backend otomatis meng-generate & menyimpan Base64 QR)
         document.getElementById('generateForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const idSeri = document.getElementById('idSeri').value;
@@ -174,7 +179,7 @@
             const resultBox = document.getElementById('resultBox');
 
             statusMsg.className = "mt-4 p-3 rounded-lg text-xs font-semibold text-center bg-yellow-600 text-white block";
-            statusMsg.innerText = "Menyimpan data ke Cloudflare KV...";
+            statusMsg.innerText = "Generating QR Code & Menyimpan data ke Cloudflare KV...";
 
             try {
                 const response = await fetch('/api/generate', {
@@ -196,12 +201,12 @@
                     document.getElementById('linkTap').value = urlTap;
                     document.getElementById('linkQr').value = urlQr;
 
-                    // 2. Generate Gambar QR Code & Atur Download Link
-                    const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(urlQr)}`;
-                    
-                    document.getElementById('qrImage').src = qrApiUrl;
-                    document.getElementById('btnDownloadQr').href = qrApiUrl;
-                    document.getElementById('btnDownloadQr').download = `QR-${idSeri}.png`;
+                    // 2. Tampilkan Gambar QR Code dari Base64 yang dikembalikan Backend (hasil simpan KV)
+                    if (result.qr_code_base64) {
+                        currentBase64Image = result.qr_code_base64;
+                        currentFilename = `${idSeri}.png`;
+                        document.getElementById('qrImage').src = result.qr_code_base64;
+                    }
 
                     // 3. Tampilkan Box Hasil Cetak
                     resultBox.classList.remove('hidden');
@@ -215,6 +220,17 @@
                 statusMsg.innerText = "Gagal terhubung ke API Server.";
             }
         });
+
+        // Fungsi Unduh Gambar QR langsung dari Base64
+        function downloadAdminQR() {
+            if (!currentBase64Image) return;
+            const link = document.createElement('a');
+            link.href = currentBase64Image;
+            link.download = currentFilename || 'QR-Code.png';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
     </script>
 </body>
 </html>
