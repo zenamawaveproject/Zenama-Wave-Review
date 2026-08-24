@@ -21,7 +21,7 @@
         </div>
     </nav>
 
-    <!-- TAMPILAN 1: LANDING PAGE BRANDING (Tampil jika TIDAK ADA parameter ?id=) -->
+    <!-- TAMPILAN 1: LANDING PAGE BRANDING -->
     <main id="brandingSection" class="max-w-4xl mx-auto px-4 py-12 text-center flex-1 flex flex-col items-center justify-center">
         <div class="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs px-3 py-1.5 rounded-full mb-6">
             ✨ Smart NFC Card for Business Growth
@@ -60,7 +60,7 @@
         </div>
     </main>
 
-    <!-- TAMPILAN 2: FORM AKTIVASI (Tampil jika ADA parameter ?id=) -->
+    <!-- TAMPILAN 2: FORM AKTIVASI -->
     <main id="activationSection" class="hidden max-w-md mx-auto px-4 py-8 flex-1 w-full flex flex-col justify-center">
         <div class="bg-slate-800/80 p-6 rounded-2xl border border-slate-700/60 shadow-2xl backdrop-blur">
             <div class="text-center mb-6">
@@ -71,14 +71,12 @@
                 <p class="text-xs text-slate-400">Aktivasi Smart NFC Card Milikmu</p>
             </div>
 
-            <!-- Display ID & Sumber Aktivasi -->
             <div class="bg-slate-900/80 border border-slate-700 rounded-lg p-3 mb-6 text-center relative">
                 <span id="sourceBadge" class="absolute top-2 right-2 text-[9px] px-2 py-0.5 rounded font-mono uppercase bg-slate-800 text-slate-400 border border-slate-700">SRC: -</span>
                 <span class="text-[10px] text-blue-400 block font-semibold tracking-wider uppercase mb-1">ID SERI KARTU DETEKSI</span>
                 <span id="displayId" class="text-lg font-bold text-white font-mono tracking-widest">-</span>
             </div>
 
-            <!-- Form Aktivasi -->
             <form id="activationForm" class="space-y-3">
                 <div>
                     <label class="block text-[11px] font-semibold text-slate-300 mb-1">8 DIGIT PIN DEFAULT</label>
@@ -116,7 +114,6 @@
         </div>
     </main>
 
-    <!-- FOOTER -->
     <footer class="border-t border-slate-800 text-center py-4 text-xs text-slate-500">
         &copy; 2026 Zenama Group. All rights reserved.
     </footer>
@@ -124,28 +121,47 @@
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const cardId = urlParams.get('id');
-        const source = urlParams.get('src') || 'unknown'; // qr, tap, atau unknown
+        const source = urlParams.get('src') || 'qr';
 
         const brandingSection = document.getElementById('brandingSection');
         const activationSection = document.getElementById('activationSection');
         const displayId = document.getElementById('displayId');
         const sourceBadge = document.getElementById('sourceBadge');
 
-        // LOGIKA PENENTU TAMPILAN
-        if (cardId) {
+        async function initPage() {
+            if (!cardId) {
+                brandingSection.classList.remove('hidden');
+                activationSection.classList.add('hidden');
+                return;
+            }
+
+            const formattedId = cardId.toUpperCase();
+
+            try {
+                const res = await fetch(`/api/dashboard?id=${encodeURIComponent(formattedId)}`);
+                const data = await res.json();
+
+                if (data.success && data.activated_at) {
+                    const targetUrl = data.google_review_url;
+                    if (targetUrl) {
+                        window.location.href = targetUrl;
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.warn("Gagal mengecek status kartu, menampilkan form aktivasi.");
+            }
+
             brandingSection.classList.add('hidden');
             activationSection.classList.remove('hidden');
-            displayId.innerText = cardId.toUpperCase();
+            displayId.innerText = formattedId;
             sourceBadge.innerText = `SRC: ${source.toUpperCase()}`;
-        } else {
-            brandingSection.classList.remove('hidden');
-            activationSection.classList.add('hidden');
         }
 
-        // SUBMIT AKTIVASI
         document.getElementById('activationForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            const formattedId = cardId.toUpperCase();
             const pin = document.getElementById('pin').value.trim();
             const namaPemilik = document.getElementById('namaPemilik').value.trim();
             const noHp = document.getElementById('noHp').value.trim();
@@ -161,13 +177,13 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
-                        idSeri: cardId.toUpperCase(), 
+                        idSeri: formattedId, 
                         pin, 
                         namaPemilik, 
                         noHp, 
                         password, 
                         reviewUrl,
-                        activationSource: source // Mengirimkan info sumber (qr/tap)
+                        activationSource: source 
                     })
                 });
 
@@ -177,9 +193,9 @@
                     statusMsg.className = "mt-4 p-3 rounded-lg text-xs font-semibold text-center bg-green-600/20 text-green-400 border border-green-500/30 block";
                     statusMsg.innerText = "Aktivasi Berhasil! Mengalihkan ke Dashboard...";
 
-                    localStorage.setItem('wave_card_id', cardId.toUpperCase());
+                    localStorage.setItem('wave_card_id', formattedId);
                     setTimeout(() => {
-                        window.location.href = `/dashboard.html?id=${cardId.toUpperCase()}`;
+                        window.location.href = `/dashboard.html?id=${formattedId}`;
                     }, 1200);
                 } else {
                     statusMsg.className = "mt-4 p-3 rounded-lg text-xs font-semibold text-center bg-red-600/20 text-red-400 border border-red-500/30 block";
@@ -190,6 +206,8 @@
                 statusMsg.innerText = "Terjadi kesalahan koneksi server.";
             }
         });
+
+        initPage();
     </script>
 </body>
 </html>
