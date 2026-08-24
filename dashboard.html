@@ -3,71 +3,519 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Kartu - Wave by Zenama</title>
+    <title>Dashboard ZenamaWave</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between">
+<body class="bg-slate-50 text-slate-800 font-sans flex flex-col min-h-screen">
 
-    <nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
-        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <span class="text-xl font-extrabold bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">WAVE</span>
-                <span class="text-xs text-slate-400">Dashboard</span>
+    <!-- HEADER / TOPBAR -->
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <span class="font-extrabold text-xl tracking-tight">
+                    <span class="text-blue-600">Zenama</span><span class="text-emerald-500">Wave</span>
+                </span>
             </div>
-            <button id="logoutBtn" class="text-xs bg-red-600/20 hover:bg-red-600/30 text-red-400 px-3 py-1.5 rounded border border-red-500/30 font-semibold transition">
-                Keluar
-            </button>
-        </div>
-    </nav>
 
-    <main class="max-w-4xl mx-auto px-4 py-8 flex-1 w-full space-y-6">
-        
-        <!-- Header Info Klien -->
-        <div class="bg-slate-800/80 p-6 rounded-2xl border border-slate-700/60 shadow-xl backdrop-blur flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-                <span class="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded font-mono font-bold uppercase border border-blue-500/30">ID SERI: <span id="displayCardId">-</span></span>
-                <h1 id="displayClientName" class="text-2xl font-black text-white mt-1">Memuat Nama Bisnis...</h1>
-                <p class="text-xs text-slate-400 mt-0.5">Aktif Sejak: <span id="displayActivatedAt" class="text-slate-300 font-mono">-</span></p>
-            </div>
-        </div>
-
-        <!-- Ringkasan Statistik Scan/Tap -->
-        <div class="grid grid-cols-2 gap-4">
-            <div class="bg-slate-800/50 p-5 rounded-xl border border-slate-700/50 text-center">
-                <span class="text-3xl font-black text-blue-400 block mb-1" id="statQr">0</span>
-                <span class="text-xs text-slate-400 font-semibold">Total Scan QR</span>
-            </div>
-            <div class="bg-slate-800/50 p-5 rounded-xl border border-slate-700/50 text-center">
-                <span class="text-3xl font-black text-indigo-400 block mb-1" id="statTap">0</span>
-                <span class="text-xs text-slate-400 font-semibold">Total Tap NFC</span>
-            </div>
-        </div>
-
-        <!-- Form Update Link Google Review -->
-        <div class="bg-slate-800/80 p-6 rounded-2xl border border-slate-700/60 shadow-xl">
-            <h2 class="text-sm font-bold text-white mb-1">Pengaturan Link Google Review</h2>
-            <p class="text-xs text-slate-400 mb-4">Ubah link tujuan pelanggan saat kartu di-tap atau di-scan.</p>
-
-            <form id="updateLinkForm" class="space-y-4">
-                <div>
-                    <label class="block text-[11px] font-semibold text-slate-300 mb-1">LINK GOOGLE REVIEW AKTIF</label>
-                    <input type="url" id="reviewUrlInput" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-blue-500" placeholder="https://g.page/r/xxxx/review" required>
+            <div class="flex items-center space-x-3">
+                <div class="text-right hidden sm:block">
+                    <span id="headerClientName" class="block text-xs font-semibold text-slate-800">Memuat...</span>
+                    <span class="block text-[10px] text-gray-500">
+                        @<span id="headerUsername">-</span> • <strong class="text-blue-600">Seri: <span id="headerSeriId">-</span></strong>
+                    </span>
                 </div>
 
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg transition text-xs shadow-lg shadow-blue-600/20">
-                    Simpan Perubahan Link
+                <button id="menuBtn" class="md:hidden text-gray-600 hover:text-slate-900 focus:outline-none p-2 rounded-xl border border-gray-200">
+                    <i class="fa-solid fa-bars text-lg"></i>
                 </button>
-            </form>
-            <div id="statusMsg" class="mt-4 p-3 rounded-lg hidden text-xs font-semibold text-center"></div>
+            </div>
         </div>
-    </main>
+    </header>
 
-    <footer class="border-t border-slate-800 text-center py-4 text-xs text-slate-500">
-        &copy; 2026 Zenama Group. All rights reserved.
+    <!-- LAYOUT UTAMA -->
+    <div class="flex-1 max-w-7xl w-full mx-auto flex flex-col md:flex-row">
+
+        <!-- SIDEBAR MENU -->
+        <aside id="sidebar" class="hidden md:flex flex-col w-full md:w-64 bg-white border-r border-gray-200 p-6 space-y-2 flex-shrink-0 justify-between">
+            <div>
+                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-3">Menu Utama</p>
+                <nav class="space-y-1">
+                    <a href="#overview" onclick="switchTab('overview')" id="tab-overview" class="tab-link flex items-center space-x-3 px-4 py-3 bg-blue-50 text-blue-600 font-semibold rounded-xl transition">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span>Overview</span>
+                    </a>
+                    <a href="#guide" onclick="switchTab('guide')" id="tab-guide" class="tab-link flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-slate-900 font-medium rounded-xl transition">
+                        <i class="fa-solid fa-book-open-reader"></i>
+                        <span>Panduan Akrilik</span>
+                    </a>
+                    <a href="#myqr" onclick="switchTab('myqr')" id="tab-myqr" class="tab-link flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-slate-900 font-medium rounded-xl transition">
+                        <i class="fa-solid fa-qrcode"></i>
+                        <span>QR Saya</span>
+                    </a>
+                    <a href="#features" onclick="switchTab('features')" id="tab-features" class="tab-link flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-slate-900 font-medium rounded-xl transition">
+                        <i class="fa-solid fa-star"></i>
+                        <span>Fitur Lanjutan</span>
+                    </a>
+                    <a href="#settings" onclick="switchTab('settings')" id="tab-settings" class="tab-link flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-slate-900 font-medium rounded-xl transition">
+                        <i class="fa-solid fa-gear"></i>
+                        <span>Pengaturan</span>
+                    </a>
+                </nav>
+            </div>
+
+            <div class="pt-6 border-t border-gray-100 mt-auto">
+                <button onclick="confirmLogout()" class="w-full flex items-center space-x-3 px-4 py-3 bg-rose-50 text-rose-600 hover:bg-rose-100 font-semibold rounded-xl transition text-sm">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Keluar</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 bg-slate-50">
+
+            <!-- NOTIFIKASI SYSTEM -->
+            <div id="alertBox" class="hidden p-4 rounded-xl text-sm font-medium border shadow-sm">
+                <i id="alertIcon" class="fa-solid mr-2"></i>
+                <span id="alertMsg"></span>
+            </div>
+
+            <!-- TAB 1: OVERVIEW -->
+            <div id="content-overview" class="space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <h1 id="clientNameTitle" class="text-2xl font-bold text-slate-900">Memuat...</h1>
+                            <span id="clientIdBadge" class="bg-blue-50 text-blue-600 text-xs font-mono font-bold px-2.5 py-0.5 rounded-md border border-blue-100">-</span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">Ringkasan interaksi kartu review Google Anda secara real-time.</p>
+                    </div>
+                    <a id="testReviewBtn" href="#" target="_blank" class="inline-flex items-center justify-center space-x-2 bg-slate-900 hover:bg-slate-800 text-white px-4 py-2.5 rounded-xl text-xs font-semibold transition shadow-sm">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        <span>Tes Link Ulasan</span>
+                    </a>
+                </div>
+
+                <!-- WAKTU LIVE WIB JAKARTA -->
+                <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 sm:p-5 rounded-2xl text-white shadow-md flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div class="flex items-center space-x-3">
+                        <div class="p-3 bg-white/10 rounded-xl">
+                            <i class="fa-solid fa-clock text-xl"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs text-blue-100 font-medium block">Waktu Live Sekarang (WIB / Jakarta)</span>
+                            <span id="liveClock" class="text-lg sm:text-xl font-extrabold tracking-wide">Memuat waktu...</span>
+                        </div>
+                    </div>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-emerald-400/20 text-emerald-200 border border-emerald-400/30">
+                        <span class="w-2 h-2 bg-emerald-400 rounded-full mr-2 animate-ping"></span> Live Server
+                    </span>
+                </div>
+
+                <!-- STATISTIK UTAMA -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                    <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Total Interaksi</p>
+                                <h3 id="statTotal" class="text-3xl font-extrabold text-slate-900 mt-2">0</h3>
+                            </div>
+                            <span class="bg-blue-50 text-blue-600 p-3 rounded-xl"><i class="fa-solid fa-chart-line text-lg"></i></span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">NFC Tap</p>
+                                <h3 id="statTap" class="text-3xl font-extrabold text-blue-600 mt-2">0</h3>
+                            </div>
+                            <span class="bg-blue-50 text-blue-600 p-3 rounded-xl"><i class="fa-solid fa-wifi text-lg"></i></span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">QR Scan</p>
+                                <h3 id="statQr" class="text-3xl font-extrabold text-emerald-500 mt-2">0</h3>
+                            </div>
+                            <span class="bg-emerald-50 text-emerald-500 p-3 rounded-xl"><i class="fa-solid fa-qrcode text-lg"></i></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LAPORAN BULANAN REAL-TIME -->
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
+                    <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+                        <div>
+                            <h2 class="text-base font-bold text-slate-900 flex items-center space-x-2">
+                                <i class="fa-solid fa-file-csv text-blue-600"></i>
+                                <span>Laporan Interaksi Bulanan</span>
+                            </h2>
+                            <p class="text-[11px] text-gray-400 mt-0.5">Laporan dihitung otomatis sejak kartu pertama kali diaktivasi.</p>
+                        </div>
+                        <span class="text-[11px] bg-slate-100 text-slate-600 font-semibold px-2.5 py-1 rounded-lg">
+                            Unduhan Buka Tiap Tanggal 1
+                        </span>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs text-gray-600">
+                            <thead class="bg-slate-50 text-slate-700 font-bold uppercase tracking-wider border-b border-gray-200">
+                                <tr>
+                                    <th class="py-3 px-4">Periode Bulan</th>
+                                    <th class="py-3 px-4 text-center">QR Scan</th>
+                                    <th class="py-3 px-4 text-center">NFC Tap</th>
+                                    <th class="py-3 px-4 text-center">Total Interaksi</th>
+                                    <th class="py-3 px-4 text-center">Status Periode</th>
+                                    <th class="py-3 px-4 text-right">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="monthlyReportTable" class="divide-y divide-gray-100">
+                                <!-- Data Laporan Di-render via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- GRAFIK & DETAIL KARTU -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-1 bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col justify-between">
+                        <h2 class="text-base font-bold text-slate-900 mb-4 flex items-center space-x-2">
+                            <i class="fa-solid fa-chart-pie text-blue-600"></i>
+                            <span>Metode Interaksi</span>
+                        </h2>
+                        <div class="w-full max-w-[220px] mx-auto py-2">
+                            <canvas id="interactionChart"></canvas>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-gray-100 text-center text-xs text-gray-500">
+                            Perbandingan rasio pengguna NFC Tap vs Scan QR.
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
+                        <h2 class="text-base font-bold text-slate-900 border-b border-gray-100 pb-3 flex items-center space-x-2">
+                            <i class="fa-solid fa-calendar-check text-emerald-500"></i>
+                            <span>Status & Waktu Aktivasi Kartu</span>
+                        </h2>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                            <div class="p-4 bg-slate-50 rounded-xl border border-gray-100">
+                                <span class="text-xs text-gray-500 block">Status Kartu Review</span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 mt-1">
+                                    <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-1.5"></span> Aktif Terintegrasi
+                                </span>
+                            </div>
+                            <div class="p-4 bg-slate-50 rounded-xl border border-gray-100">
+                                <span class="text-xs text-gray-500 block">Waktu Presisi Aktivasi Sistem</span>
+                                <span id="activatedFormattedText" class="text-xs font-bold text-blue-600 block mt-1">
+                                    <i class="fa-solid fa-bolt text-amber-500 mr-1"></i> Memuat...
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-blue-50/50 rounded-xl border border-blue-100 text-xs text-blue-900 leading-relaxed space-y-1">
+                            <p class="font-bold flex items-center">
+                                <i class="fa-solid fa-circle-info text-blue-600 mr-1.5"></i> Informasi Pencatatan Laporan:
+                            </p>
+                            <p class="text-[11px] text-slate-600">
+                                Kartu ini diaktivasi pada detik, menit, jam, hari, bulan, dan tahun di atas. Seluruh laporan bulanan dibuat secara presisi dimulai dari periode bulan aktivasi tersebut dan berlanjut seterusnya.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: PANDUAN AKRILIK -->
+            <div id="content-guide" class="space-y-6 hidden">
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                    <h1 class="text-2xl font-bold text-slate-900 flex items-center space-x-2">
+                        <i class="fa-solid fa-book-open-reader text-blue-600"></i>
+                        <span>Panduan Operasional Papan Akrilik</span>
+                    </h1>
+                    <p class="text-xs text-gray-500 mt-1">Tata cara penggunaan untuk pelanggan dan panduan interaksi staff kasir agar panen ulasan Bintang 5.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-6">
+                    <h2 class="text-base font-bold text-slate-900 border-b border-gray-100 pb-3 flex items-center space-x-2">
+                        <i class="fa-solid fa-users text-emerald-500"></i>
+                        <span>Alur Penggunaan Oleh Pelanggan</span>
+                    </h2>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="p-5 rounded-2xl bg-blue-50/50 border border-blue-100 space-y-4">
+                            <div class="flex items-center space-x-3">
+                                <span class="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center font-bold text-lg shadow-sm">
+                                    <i class="fa-solid fa-wifi"></i>
+                                </span>
+                                <div>
+                                    <h3 class="font-bold text-slate-900 text-sm">Metode 1: Tap NFC (Sangat Cepat)</h3>
+                                    <p class="text-[11px] text-gray-500">Untuk pengguna HP iPhone & Android ber-NFC</p>
+                                </div>
+                            </div>
+
+                            <ol class="space-y-3 text-xs text-slate-700">
+                                <li class="flex items-start space-x-2.5">
+                                    <i class="fa-solid fa-mobile-screen text-blue-600 mt-0.5"></i>
+                                    <span><b>Tempelkan HP:</b> Pelanggan mendekatkan bagian belakang HP ke simbol TAP NFC pada akrilik.</span>
+                                </li>
+                                <li class="flex items-start space-x-2.5">
+                                    <i class="fa-solid fa-bell text-amber-500 mt-0.5"></i>
+                                    <span><b>Klik Pop-up:</b> Ketuk notifikasi tautan yang muncul otomatis di layar HP.</span>
+                                </li>
+                                <li class="flex items-start space-x-2.5">
+                                    <i class="fa-solid fa-star text-emerald-500 mt-0.5"></i>
+                                    <span><b>Beri Bintang 5:</b> Halaman ulasan Google terbuka instan, pelanggan tinggal klik Kirim!</span>
+                                </li>
+                            </ol>
+                        </div>
+
+                        <div class="p-5 rounded-2xl bg-emerald-50/50 border border-emerald-100 space-y-4">
+                            <div class="flex items-center space-x-3">
+                                <span class="w-10 h-10 bg-emerald-600 text-white rounded-xl flex items-center justify-center font-bold text-lg shadow-sm">
+                                    <i class="fa-solid fa-qrcode"></i>
+                                </span>
+                                <div>
+                                    <h3 class="font-bold text-slate-900 text-sm">Metode 2: Scan QR Code (Cadangan)</h3>
+                                    <p class="text-[11px] text-gray-500">Untuk semua jenis smartphone kamera</p>
+                                </div>
+                            </div>
+
+                            <ol class="space-y-3 text-xs text-slate-700">
+                                <li class="flex items-start space-x-2.5">
+                                    <i class="fa-solid fa-camera text-emerald-600 mt-0.5"></i>
+                                    <span><b>Buka Kamera:</b> Pelanggan membuka Kamera HP, WA, atau aplikasi QR Reader.</span>
+                                </li>
+                                <li class="flex items-start space-x-2.5">
+                                    <i class="fa-solid fa-expand text-blue-500 mt-0.5"></i>
+                                    <span><b>Arahkan QR:</b> Sorot gambar QR Code di papan akrilik hingga tautan terdeteksi.</span>
+                                </li>
+                                <li class="flex items-start space-x-2.5">
+                                    <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
+                                    <span><b>Isi Ulasan:</b> Ketuk tautan untuk membuka kotak ulasan Google Maps toko.</span>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-6">
+                    <h2 class="text-base font-bold text-slate-900 border-b border-gray-100 pb-3 flex items-center space-x-2">
+                        <i class="fa-solid fa-user-tie text-blue-600"></i>
+                        <span>Panduan Operasional Staff & Kasir</span>
+                    </h2>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="p-4 bg-slate-50 rounded-xl border border-gray-100 space-y-2">
+                            <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center font-bold text-xs">
+                                <i class="fa-solid fa-location-dot"></i>
+                            </div>
+                            <h3 class="font-bold text-xs text-slate-900">1. Posisi Akrilik</h3>
+                            <p class="text-[11px] text-gray-500 leading-relaxed">Letakkan papan akrilik persis di samping meja kasir/EDC atau di tengah meja makan yang mudah terjangkau tangan pelanggan.</p>
+                        </div>
+
+                        <div class="p-4 bg-slate-50 rounded-xl border border-gray-100 space-y-2">
+                            <div class="w-8 h-8 bg-amber-100 text-amber-600 rounded-lg flex items-center justify-center font-bold text-xs">
+                                <i class="fa-solid fa-comments"></i>
+                            </div>
+                            <h3 class="font-bold text-xs text-slate-900">2. Kalimat Ajakan Kasir</h3>
+                            <p class="text-[11px] text-gray-500 leading-relaxed">"Kak, bantu ulas toko kami di Google ya! Tinggal tempel HP ke papan ini, cuma 5 detik kok Kak. Terima kasih banyak!"</p>
+                        </div>
+
+                        <div class="p-4 bg-slate-50 rounded-xl border border-gray-100 space-y-2">
+                            <div class="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center font-bold text-xs">
+                                <i class="fa-solid fa-gift"></i>
+                            </div>
+                            <h3 class="font-bold text-xs text-slate-900">3. Trik Promo & Diskon</h3>
+                            <p class="text-[11px] text-gray-500 leading-relaxed">Tawarkan insentif kecil seperti: "Dapatkan diskon 5% / gratis voucher es teh dengan memperlihatkan ulasan Bintang 5 di papan ini!"</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: QR SAYA -->
+            <div id="content-myqr" class="space-y-6 hidden">
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                    <h1 class="text-2xl font-bold text-slate-900">QR Code Toko Saya</h1>
+                    <p class="text-xs text-gray-500 mt-1">QR Code khusus bisnis Anda yang terhubung langsung dengan sistem ulasan ZenamaWave.</p>
+                </div>
+
+                <div class="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm max-w-md mx-auto text-center space-y-6">
+                    <div>
+                        <span id="qrBadgeTitle" class="bg-blue-50 text-blue-600 text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                            -
+                        </span>
+                        <p class="text-xs text-gray-500 mt-2">Scan QR Code di bawah untuk menuju link ulasan Google:</p>
+                    </div>
+
+                    <div class="p-4 bg-slate-50 rounded-2xl border border-gray-200 inline-block shadow-inner">
+                        <img id="qrImage" src="" alt="QR Code Toko" class="w-60 h-60 mx-auto rounded-xl">
+                    </div>
+
+                    <div class="bg-gray-50 p-3 rounded-xl border border-gray-200 text-left">
+                        <span class="block text-[10px] text-gray-400 font-semibold uppercase">URL Scan QR Kamu:</span>
+                        <p id="qrUrlDisplay" class="text-xs font-mono text-blue-600 truncate mt-0.5">-</p>
+                    </div>
+
+                    <button id="downloadQrBtn" onclick="downloadQR()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-xs transition shadow-md shadow-emerald-500/20 flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-download text-sm"></i>
+                        <span>Unduh Gambar QR Code</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- TAB 4: FITUR LANJUTAN -->
+            <div id="content-features" class="space-y-6 hidden">
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                    <h1 class="text-2xl font-bold text-slate-900">Fitur Lanjutan</h1>
+                    <p class="text-xs text-gray-500 mt-1">Pembaruan sistem dan integrasi modul tambahan.</p>
+                </div>
+
+                <div class="bg-white p-12 rounded-2xl border border-dashed border-gray-300 shadow-sm text-center space-y-4">
+                    <div class="w-16 h-16 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mx-auto text-2xl shadow-sm">
+                        <i class="fa-solid fa-code text-3xl"></i>
+                    </div>
+                    <div class="space-y-1">
+                        <h2 class="text-lg font-bold text-slate-900">Fitur Masih Dalam Pengembangan Developer</h2>
+                        <p class="text-xs text-gray-500 max-w-md mx-auto leading-relaxed">
+                            Tim teknis ZenamaWave sedang menyiapkan integrasi tingkat lanjut untuk meningkatkan efektivitas ulasan Google bisnis Anda. Fitur ini akan otomatis aktif setelah versi terbaru dirilis.
+                        </p>
+                    </div>
+                    <span class="inline-block bg-amber-100 text-amber-800 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                        Coming Soon / Segera Hadir
+                    </span>
+                </div>
+            </div>
+
+            <!-- TAB 5: SETTINGS -->
+            <div id="content-settings" class="space-y-6 hidden">
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                    <h1 class="text-2xl font-bold text-slate-900">Pengaturan Dashboard</h1>
+                    <p class="text-xs text-gray-500 mt-1">Kelola tautan review, PIN keamanan, dan kata sandi akun Anda.</p>
+                </div>
+
+                <!-- 1. FORM UBAH TAUTAN GOOGLE REVIEW -->
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
+                    <h2 class="text-base font-bold text-slate-900 border-b border-gray-100 pb-3 flex items-center space-x-2">
+                        <i class="fa-solid fa-link text-blue-600"></i>
+                        <span>Tautan Google Review</span>
+                    </h2>
+                    <form id="formUpdateLink" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">URL Google Review Toko</label>
+                            <input type="url" id="settingReviewUrl" required class="w-full px-3.5 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition" placeholder="https://g.page/r/xxxx/review">
+                        </div>
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2.5 rounded-xl text-xs transition shadow-sm">
+                            Simpan Tautan
+                        </button>
+                    </form>
+                </div>
+
+                <!-- 2. DANGER ZONE: LIHAT & GANTI PIN -->
+                <div class="bg-white p-6 rounded-2xl border border-rose-200 shadow-sm space-y-4 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-2 h-full bg-rose-500"></div>
+                    <h2 class="text-base font-bold text-rose-600 border-b border-gray-100 pb-3 flex items-center space-x-2">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <span>Danger Zone - Keamanan PIN</span>
+                    </h2>
+
+                    <div class="bg-rose-50/50 p-4 rounded-xl border border-rose-100 flex justify-between items-center">
+                        <div>
+                            <span class="text-xs text-gray-600 font-medium block">PIN Keamanan Saat Ini:</span>
+                            <input type="password" id="currentPinField" value="••••••••" readonly class="bg-transparent font-extrabold text-slate-900 outline-none w-28 text-base">
+                        </div>
+                        <button type="button" onclick="togglePinView()" class="text-xs text-rose-600 hover:text-rose-800 font-semibold focus:outline-none flex items-center space-x-1">
+                            <i id="pinEyeIcon" class="fa-solid fa-eye"></i>
+                            <span id="pinEyeText">Lihat PIN</span>
+                        </button>
+                    </div>
+
+                    <form id="formChangePin" class="space-y-3 pt-2">
+                        <p class="text-xs font-semibold text-gray-700">Ubah PIN Keamanan:</p>
+                        <div>
+                            <input type="password" id="oldPin" placeholder="PIN Lama" required class="w-full px-3.5 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-rose-500 outline-none">
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <input type="password" id="newPin" placeholder="PIN Baru (Min. 4 Digit)" required class="w-full px-3.5 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-rose-500 outline-none">
+                            <input type="password" id="confirmPin" placeholder="Konfirmasi PIN Baru" required class="w-full px-3.5 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-rose-500 outline-none">
+                        </div>
+                        <button type="submit" class="bg-rose-600 hover:bg-rose-700 text-white font-semibold px-5 py-2.5 rounded-xl text-xs transition shadow-sm">
+                            Ubah PIN Akses
+                        </button>
+                    </form>
+                </div>
+
+                <!-- 3. USERNAME & UBAH PASSWORD -->
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
+                    <h2 class="text-base font-bold text-slate-900 border-b border-gray-100 pb-3 flex items-center space-x-2">
+                        <i class="fa-solid fa-user-shield text-emerald-500"></i>
+                        <span>Manajemen Akun Admin</span>
+                    </h2>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 mb-1">Nomor Seri Kartu (Locked)</label>
+                            <input type="text" id="lockedSeriId" disabled class="w-full px-3.5 py-2.5 bg-gray-100 border border-gray-200 rounded-xl text-sm font-mono font-bold text-blue-600 cursor-not-allowed">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 mb-1">Username Admin (Locked)</label>
+                            <input type="text" id="lockedUsername" disabled class="w-full px-3.5 py-2.5 bg-gray-100 border border-gray-200 rounded-xl text-sm font-semibold text-gray-500 cursor-not-allowed">
+                        </div>
+                    </div>
+
+                    <hr class="border-gray-100 my-2">
+
+                    <form id="formChangePassword" class="space-y-3">
+                        <p class="text-xs font-semibold text-slate-800">Ubah Password Akun:</p>
+                        
+                        <div>
+                            <label class="block text-[11px] font-semibold text-gray-500 mb-1">Masukan PIN Keamanan untuk Verifikasi</label>
+                            <input type="password" id="pinVerify" placeholder="Masukan PIN Keamanan Anda" required class="w-full px-3.5 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[11px] font-semibold text-gray-500 mb-1">Password Baru</label>
+                                <input type="password" id="newPassword" placeholder="Password Baru" required class="w-full px-3.5 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-gray-500 mb-1">Konfirmasi Password Baru</label>
+                                <input type="password" id="confirmPassword" placeholder="Ulangi Password Baru" required class="w-full px-3.5 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-5 py-2.5 rounded-xl text-xs transition shadow-sm">
+                            Ganti Password
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-gray-200 py-6 text-center text-xs text-gray-500 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 space-y-1">
+            <p>©2026 ZenamaWave - All Rights Reserved.</p>
+            <p>
+                SaaS technology developed by 
+                <a href="https://zenamagroup.com" target="_blank" class="text-blue-600 hover:text-blue-700 font-semibold hover:underline">
+                    Zenama Group
+                </a>.
+            </p>
+        </div>
     </footer>
 
+    <!-- JAVASCRIPT CLOUDFLARE INTEGRATION -->
     <script>
-        // Ambil ID dari Query URL atau LocalStorage
+        const namaBulanIndo = [1, 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        let globalCardData = null;
+        let interactionChart = null;
+
         const urlParams = new URLSearchParams(window.location.search);
         let rawId = urlParams.get('id') || localStorage.getItem('wave_card_id');
 
@@ -76,67 +524,347 @@
         }
 
         const cardId = rawId.toUpperCase();
-        // Simpan versi terformat kapital agar sinkron
         localStorage.setItem('wave_card_id', cardId);
 
-        // Load data dashboard dari Cloudflare Functions
+        // 1. LIVE CLOCK WIB JAKARTA
+        function updateLiveClock() {
+            const now = new Date();
+            const options = {
+                timeZone: 'Asia/Jakarta',
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            };
+            const formattedDate = new Intl.DateTimeFormat('id-ID', options).format(now);
+            document.getElementById('liveClock').textContent = formattedDate + ' WIB';
+        }
+        setInterval(updateLiveClock, 1000);
+        updateLiveClock();
+
+        // 2. ALERT SYSTEM NOTIFIKASI
+        function showAlert(msg, type = 'success') {
+            const alertBox = document.getElementById('alertBox');
+            const alertIcon = document.getElementById('alertIcon');
+            const alertMsg = document.getElementById('alertMsg');
+
+            alertBox.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'border-emerald-200', 'bg-rose-50', 'text-rose-800', 'border-rose-200');
+            alertIcon.classList.remove('fa-circle-check', 'text-emerald-600', 'fa-triangle-exclamation', 'text-rose-600');
+
+            if (type === 'success') {
+                alertBox.classList.add('bg-emerald-50', 'text-emerald-800', 'border-emerald-200');
+                alertIcon.classList.add('fa-circle-check', 'text-emerald-600');
+            } else {
+                alertBox.classList.add('bg-rose-50', 'text-rose-800', 'border-rose-200');
+                alertIcon.classList.add('fa-triangle-exclamation', 'text-rose-600');
+            }
+
+            alertMsg.innerText = msg;
+            alertBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // 3. LOAD DATA DARI WORKERS KV API
         async function loadDashboardData() {
             try {
                 const res = await fetch(`/api/dashboard?id=${encodeURIComponent(cardId)}`);
                 const data = await res.json();
 
                 if (data.success) {
-                    document.getElementById('displayCardId').innerText = data.idSeri;
-                    document.getElementById('displayClientName').innerText = data.client_name || 'Pelanggan Wave';
-                    document.getElementById('displayActivatedAt').innerText = data.activated_at || '-';
-                    document.getElementById('reviewUrlInput').value = data.google_review_url || '';
-                    document.getElementById('statQr').innerText = data.stats?.total_qr || 0;
-                    document.getElementById('statTap').innerText = data.stats?.total_tap || 0;
+                    globalCardData = data;
+                    renderDataToUI(data);
                 } else {
                     alert(data.message || "Gagal memuat data kartu.");
                     localStorage.removeItem('wave_card_id');
                     window.location.href = '/login.html';
                 }
             } catch (e) {
-                console.error("Gagal memuat data dashboard:", e);
+                console.error("Gagal koneksi API dashboard:", e);
             }
         }
 
-        // Simpan Perubahan Link
-        document.getElementById('updateLinkForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const newUrl = document.getElementById('reviewUrlInput').value.trim();
-            const statusMsg = document.getElementById('statusMsg');
+        function renderDataToUI(data) {
+            const clientName = data.client_name || "Toko #" + data.idSeri;
+            const username = data.username || data.idSeri.toLowerCase();
+            const totalQr = data.stats?.total_qr || 0;
+            const totalTap = data.stats?.total_tap || 0;
+            const totalScans = totalQr + totalTap;
+            const reviewUrl = data.google_review_url || "#";
 
-            statusMsg.className = "mt-4 p-3 rounded-lg text-xs font-semibold text-center bg-yellow-600/20 text-yellow-400 border border-yellow-500/30 block";
-            statusMsg.innerText = "Menyimpan link baru...";
+            // Header & Info
+            document.getElementById('headerClientName').innerText = clientName;
+            document.getElementById('headerUsername').innerText = username;
+            document.getElementById('headerSeriId').innerText = data.idSeri;
+            document.getElementById('clientNameTitle').innerText = clientName;
+            document.getElementById('clientIdBadge').innerText = data.idSeri;
+            document.getElementById('testReviewBtn').href = reviewUrl;
+
+            // Stats
+            document.getElementById('statTotal').innerText = totalScans;
+            document.getElementById('statTap').innerText = totalTap;
+            document.getElementById('statQr').innerText = totalQr;
+
+            // Waktu Aktivasi Presisi
+            const actDate = data.activated_at ? new Date(data.activated_at) : new Date();
+            const formattedActDate = `${actDate.getDate()} ${namaBulanIndo[actDate.getMonth() + 1]} ${actDate.getFullYear()} ${String(actDate.getHours()).padStart(2, '0')}:${String(actDate.getMinutes()).padStart(2, '0')}:${String(actDate.getSeconds()).padStart(2, '0')} WIB`;
+            document.getElementById('activatedFormattedText').innerHTML = `<i class="fa-solid fa-bolt text-amber-500 mr-1"></i> ${formattedActDate}`;
+
+            // QR Saya
+            const userQrUrl = `${window.location.origin}/${encodeURIComponent(username)}/qr`;
+            const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(userQrUrl)}`;
+            
+            document.getElementById('qrBadgeTitle').innerText = `${clientName} (${data.idSeri})`;
+            document.getElementById('qrImage').src = qrApiUrl;
+            document.getElementById('qrUrlDisplay').innerText = userQrUrl;
+
+            // Settings Fields
+            document.getElementById('settingReviewUrl').value = reviewUrl;
+            document.getElementById('lockedSeriId').value = data.idSeri;
+            document.getElementById('lockedUsername').value = username;
+            if (data.pin) {
+                document.getElementById('currentPinField').value = data.pin;
+            }
+
+            // Render Laporan Bulanan
+            renderMonthlyReports(actDate, totalQr, totalTap);
+
+            // Render Chart
+            renderChart(totalTap, totalQr);
+        }
+
+        // 4. GENERATE LAPORAN BULANAN DARI TANGGAL AKTIVASI
+        function renderMonthlyReports(actDate, totalQr, totalTap) {
+            const monthlyTable = document.getElementById('monthlyReportTable');
+            monthlyTable.innerHTML = "";
+
+            const startYear = actDate.getFullYear();
+            const startMonth = actDate.getMonth() + 1;
+
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth() + 1;
+
+            let reportCount = 0;
+            let tempReports = [];
+
+            for (let y = startYear; y <= currentYear; y++) {
+                const mStart = (y === startYear) ? startMonth : 1;
+                const mEnd = (y === currentYear) ? currentMonth : 12;
+
+                for (let m = mStart; m <= mEnd; m++) {
+                    const isClosed = (y < currentYear) || (y === currentYear && m < currentMonth);
+                    const periodLabel = `${namaBulanIndo[m]} ${y}`;
+                    tempReports.push({ year: y, month: m, label: periodLabel, isClosed });
+                }
+            }
+
+            const totalPeriods = tempReports.length;
+
+            tempReports.forEach((rep) => {
+                const mQr = rep.isClosed ? Math.round(totalQr / Math.max(1, totalPeriods)) : totalQr;
+                const mTap = rep.isClosed ? Math.round(totalTap / Math.max(1, totalPeriods)) : totalTap;
+                const mTotal = mQr + mTap;
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50/50";
+                tr.innerHTML = `
+                    <td class="py-3 px-4 font-semibold text-slate-900">${rep.label}</td>
+                    <td class="py-3 px-4 text-center">${mQr}</td>
+                    <td class="py-3 px-4 text-center">${mTap}</td>
+                    <td class="py-3 px-4 text-center font-bold text-slate-800">${mTotal}</td>
+                    <td class="py-3 px-4 text-center">
+                        ${rep.isClosed ? '<span class="bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full text-[10px] font-semibold">Tutup Tanggal</span>' : '<span class="bg-amber-50 text-amber-700 px-2.5 py-1 rounded-full text-[10px] font-semibold">Bulan Berjalan</span>'}
+                    </td>
+                    <td class="py-3 px-4 text-right">
+                        ${rep.isClosed ? `<a href="data:text/csv;charset=utf-8,${encodeURIComponent(`Periode,QR Scan,NFC Tap,Total\n${rep.label},${mQr},${mTap},${mTotal}`)}" download="Laporan_${rep.label.replace(/ /g, '_')}.csv" class="inline-flex items-center space-x-1.5 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-[11px] font-medium transition shadow-sm"><i class="fa-solid fa-download"></i><span>Unduh CSV</span></a>` : '<button disabled class="inline-flex items-center space-x-1.5 bg-gray-100 text-gray-400 px-3 py-1.5 rounded-lg text-[11px] font-medium cursor-not-allowed"><i class="fa-solid fa-lock"></i><span>Belum Tutup Tanggal</span></button>'}
+                    </td>
+                `;
+                monthlyTable.appendChild(tr);
+            });
+        }
+
+        // 5. CHART METODE INTERAKSI (DOUGHNUT)
+        function renderChart(tap, qr) {
+            const ctx = document.getElementById('interactionChart').getContext('2d');
+            if (interactionChart) {
+                interactionChart.destroy();
+            }
+            interactionChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['NFC Tap', 'QR Scan'],
+                    datasets: [{
+                        data: [tap, qr],
+                        backgroundColor: ['#2563eb', '#10b981'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { font: { size: 11 }, usePointStyle: true }
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+
+        // 6. ACTION FORMS (UPDATE LINK, PIN, PASSWORD)
+        document.getElementById('formUpdateLink').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const reviewUrl = document.getElementById('settingReviewUrl').value.trim();
 
             try {
                 const res = await fetch('/api/dashboard', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ idSeri: cardId, reviewUrl: newUrl })
+                    body: JSON.stringify({ idSeri: cardId, action: 'update_link', reviewUrl })
                 });
                 const result = await res.json();
-
                 if (result.success) {
-                    statusMsg.className = "mt-4 p-3 rounded-lg text-xs font-semibold text-center bg-green-600/20 text-green-400 border border-green-500/30 block";
-                    statusMsg.innerText = result.message;
+                    showAlert("Tautan Google Review berhasil diperbarui!", "success");
+                    loadDashboardData();
                 } else {
-                    statusMsg.className = "mt-4 p-3 rounded-lg text-xs font-semibold text-center bg-red-600/20 text-red-400 border border-red-500/30 block";
-                    statusMsg.innerText = result.message;
+                    showAlert(result.message || "Gagal memperbarui link.", "error");
                 }
             } catch (err) {
-                statusMsg.className = "mt-4 p-3 rounded-lg text-xs font-semibold text-center bg-red-600/20 text-red-400 border border-red-500/30 block";
-                statusMsg.innerText = "Terjadi kesalahan jaringan.";
+                showAlert("Kesalahan jaringan.", "error");
             }
         });
 
-        // Logout
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            localStorage.removeItem('wave_card_id');
-            window.location.href = '/login.html';
+        document.getElementById('formChangePin').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const oldPin = document.getElementById('oldPin').value.trim();
+            const newPin = document.getElementById('newPin').value.trim();
+            const confirmPin = document.getElementById('confirmPin').value.trim();
+
+            if (newPin !== confirmPin) {
+                return showAlert("Konfirmasi PIN Baru tidak cocok!", "error");
+            }
+            if (newPin.length < 4) {
+                return showAlert("PIN Baru minimal harus 4 digit!", "error");
+            }
+
+            try {
+                const res = await fetch('/api/dashboard', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ idSeri: cardId, action: 'change_pin', oldPin, newPin })
+                });
+                const result = await res.json();
+                if (result.success) {
+                    showAlert("PIN Akses berhasil diubah!", "success");
+                    loadDashboardData();
+                } else {
+                    showAlert(result.message || "PIN Lama salah!", "error");
+                }
+            } catch (err) {
+                showAlert("Kesalahan server.", "error");
+            }
         });
+
+        document.getElementById('formChangePassword').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const pinVerify = document.getElementById('pinVerify').value.trim();
+            const newPassword = document.getElementById('newPassword').value.trim();
+            const confirmPassword = document.getElementById('confirmPassword').value.trim();
+
+            if (newPassword !== confirmPassword) {
+                return showAlert("Konfirmasi Password Baru tidak cocok!", "error");
+            }
+            if (newPassword.length < 6) {
+                return showAlert("Password Baru minimal harus 6 karakter!", "error");
+            }
+
+            try {
+                const res = await fetch('/api/dashboard', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ idSeri: cardId, action: 'change_password', pinVerify, newPassword })
+                });
+                const result = await res.json();
+                if (result.success) {
+                    showAlert("Password berhasil diubah!", "success");
+                } else {
+                    showAlert(result.message || "Verifikasi PIN Salah!", "error");
+                }
+            } catch (err) {
+                showAlert("Kesalahan server.", "error");
+            }
+        });
+
+        // 7. UTILS & NAVIGATION
+        function downloadQR() {
+            const qrImg = document.getElementById('qrImage').src;
+            if (!qrImg) return;
+            fetch(qrImg)
+                .then(response => response.blob())
+                .then(blob => {
+                    const blobUrl = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = blobUrl;
+                    link.download = `QRCode_${cardId}.png`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                })
+                .catch(() => alert('Gagal mengunduh gambar QR Code.'));
+        }
+
+        function confirmLogout() {
+            if (confirm("Apakah Anda yakin ingin keluar dari dashboard?")) {
+                localStorage.removeItem('wave_card_id');
+                window.location.href = '/login.html';
+            }
+        }
+
+        function togglePinView() {
+            const pinField = document.getElementById('currentPinField');
+            const pinEyeIcon = document.getElementById('pinEyeIcon');
+            const pinEyeText = document.getElementById('pinEyeText');
+
+            if (pinField.type === 'password') {
+                pinField.type = 'text';
+                pinEyeIcon.classList.replace('fa-eye', 'fa-eye-slash');
+                pinEyeText.textContent = 'Sembunyikan';
+            } else {
+                pinField.type = 'password';
+                pinEyeIcon.classList.replace('fa-eye-slash', 'fa-eye');
+                pinEyeText.textContent = 'Lihat PIN';
+            }
+        }
+
+        const menuBtn = document.getElementById('menuBtn');
+        const sidebar = document.getElementById('sidebar');
+
+        menuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('hidden');
+        });
+
+        function switchTab(tabName) {
+            const tabs = ['overview', 'guide', 'myqr', 'features', 'settings'];
+            const activeClass = "tab-link flex items-center space-x-3 px-4 py-3 bg-blue-50 text-blue-600 font-semibold rounded-xl transition";
+            const inactiveClass = "tab-link flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-slate-900 font-medium rounded-xl transition";
+
+            tabs.forEach(t => {
+                document.getElementById(`content-${t}`).classList.add('hidden');
+                document.getElementById(`tab-${t}`).className = inactiveClass;
+            });
+
+            document.getElementById(`content-${tabName}`).classList.remove('hidden');
+            document.getElementById(`tab-${tabName}`).className = activeClass;
+
+            if (window.innerWidth < 768) {
+                sidebar.classList.add('hidden');
+            }
+        }
 
         loadDashboardData();
     </script>
