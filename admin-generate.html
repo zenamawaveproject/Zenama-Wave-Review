@@ -5,8 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Generate Kartu Wave</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Library QRCode JS untuk render Base64 di browser admin -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body class="bg-slate-900 text-white min-h-screen flex items-center justify-center p-4">
+
+    <!-- Container tersembunyi untuk proses pembuatan Canvas QR -->
+    <div id="qrcode-temp" class="hidden"></div>
 
     <!-- MODAL LOGIN ADMIN -->
     <div id="adminLoginModal" class="bg-slate-800 p-6 rounded-2xl shadow-2xl w-full max-w-sm border border-slate-700">
@@ -92,7 +97,7 @@
         const generatorPanel = document.getElementById('generatorPanel');
         const loginMsg = document.getElementById('loginMsg');
 
-        let currentQrSource = '';
+        let currentBase64Image = '';
         let currentFilename = '';
 
         // Check Sesi Admin
@@ -164,11 +169,38 @@
             document.getElementById('idSeri').value = makeId(8);
             document.getElementById('pin').value = makePin(8);
             document.getElementById('resultBox').classList.add('hidden');
-            currentQrSource = '';
+            currentBase64Image = '';
             currentFilename = '';
         }
 
         document.getElementById('btnRandom').addEventListener('click', generateRandomData);
+
+        // Helper untuk merender Teks/URL menjadi Gambar Base64 secara instant
+        function generateQrBase64(text) {
+            return new Promise((resolve) => {
+                const tempDiv = document.getElementById('qrcode-temp');
+                tempDiv.innerHTML = '';
+                new QRCode(tempDiv, {
+                    text: text,
+                    width: 400,
+                    height: 400,
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+
+                // Berikan jeda 150ms agar QRCode.js selesai membuat Canvas/Image
+                setTimeout(() => {
+                    const img = tempDiv.querySelector('img');
+                    const canvas = tempDiv.querySelector('canvas');
+                    if (img && img.src && img.src.startsWith('data:image')) {
+                        resolve(img.src);
+                    } else if (canvas) {
+                        resolve(canvas.toDataURL('image/png'));
+                    } else {
+                        resolve('');
+                    }
+                }, 150);
+            });
+        }
 
         // Submit Form Generate Ke KV
         document.getElementById('generateForm').addEventListener('submit', async (e) => {
@@ -179,13 +211,30 @@
             const resultBox = document.getElementById('resultBox');
 
             statusMsg.className = "mt-4 p-3 rounded-lg text-xs font-semibold text-center bg-yellow-600 text-white block";
-            statusMsg.innerText = "Generating QR Code & Menyimpan data ke Cloudflare KV...";
+            statusMsg.innerText = "Membuat QR Code Base64 & menyimpan ke Cloudflare KV...";
 
+            const urlTap = `https://cards.zenamagroup.com/?id=${idSeri}&src=tap`;
+            const urlQr = `https://cards.zenamagroup.com/?id=${idSeri}&src=qr`;
+
+            // 1. Generate Gambar QR Base64 secara instan di Browser
+            const qrBase64 = await generateQrBase64(urlQr);
+
+            if (!qrBase64) {
+                statusMsg.className = "mt-4 p-3 rounded-lg text-xs font-semibold text-center bg-red-600 text-white block";
+                statusMsg.innerText = "Gagal membuat gambar QR Code Base64.";
+                return;
+            }
+
+            // 2. Kirim payload (termasuk qr_code_base64) ke Backend Worker
             try {
                 const response = await fetch('/api/generate', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ idSeri, pin })
+                    body: JSON.stringify({ 
+                        idSeri, 
+                        pin,
+                        qr_code_base64: qrBase64 
+                    })
                 });
 
                 const result = await response.json();
@@ -194,28 +243,15 @@
                     statusMsg.className = "mt-4 p-3 rounded-lg text-xs font-semibold text-center bg-green-600 text-white block";
                     statusMsg.innerText = result.message;
 
-                    const urlTap = `https://cards.zenamagroup.com/?id=${idSeri}&src=tap`;
-                    const urlQr = `https://cards.zenamagroup.com/?id=${idSeri}&src=qr`;
-
                     document.getElementById('linkTap').value = urlTap;
                     document.getElementById('linkQr').value = urlQr;
+                    
+                    // Simpan variabel untuk diunduh
+                    currentBase64Image = qrBase64;
                     currentFilename = `${idSeri}.png`;
 
-                    // FIX PEMBACAAN QR GAMBAR:
-                    let qrSource = result.qr_code_base64;
-
-                    if (qrSource) {
-                        // Jika berupa Base64 murni tanpa header MIME, tambahkan
-                        if (!qrSource.startsWith('data:image') && !qrSource.startsWith('http')) {
-                            qrSource = 'data:image/png;base64,' + qrSource;
-                        }
-                    } else {
-                        // Fallback jika API backend belum menyediakan gambar Base64
-                        qrSource = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(urlQr)}`;
-                    }
-
-                    currentQrSource = qrSource;
-                    document.getElementById('qrImage').src = qrSource;
+                    // Tampilkan preview gambar di Admin
+                    document.getElementById('qrImage').src = qrBase64;
 
                     // Tampilkan Box Hasil Cetak
                     resultBox.classList.remove('hidden');
@@ -230,41 +266,19 @@
             }
         });
 
-        // FUNGSI UNDUH AMAN (Mendukung Base64 & External URL via Blob)
-        async function downloadAdminQR() {
-            if (!currentQrSource) {
-                alert("Gambar QR belum siap diunduh.");
+        // FUNGSI UNDUH GAMBAR QR
+        function downloadAdminQR() {
+            if (!currentBase64Image) {
+                alert("Gambar QR belum tersedia.");
                 return;
             }
 
-            try {
-                const filename = currentFilename || 'QR-Code.png';
-
-                // Jika berupa URL Base64
-                if (currentQrSource.startsWith('data:image')) {
-                    const link = document.createElement('a');
-                    link.href = currentQrSource;
-                    link.download = filename;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                } else {
-                    // Jika berupa URL HTTP/HTTPS
-                    const resp = await fetch(currentQrSource);
-                    const blob = await resp.blob();
-                    const blobUrl = URL.createObjectURL(blob);
-
-                    const link = document.createElement('a');
-                    link.href = blobUrl;
-                    link.download = filename;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    URL.revokeObjectURL(blobUrl);
-                }
-            } catch (err) {
-                alert("Gagal mengunduh gambar QR.");
-            }
+            const link = document.createElement('a');
+            link.href = currentBase64Image;
+            link.download = currentFilename || 'QR-Code.png';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
     </script>
 </body>
