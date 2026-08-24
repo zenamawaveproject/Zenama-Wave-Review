@@ -1,6 +1,10 @@
 export async function onRequestPost(context) {
     try {
         const { request, env } = context;
+        
+        // Menerima input idSeri & pin dari admin-generate.html
+        const body = await request.json().catch(() => ({}));
+        const { idSeri, pin } = body;
 
         if (!env.CARDS_KV) {
             return new Response(JSON.stringify({ 
@@ -9,58 +13,29 @@ export async function onRequestPost(context) {
             }), { status: 500 });
         }
 
-        // Fungsi Helper untuk membuat 8 karakter acak (Angka & Huruf Kapital)
-        function makeId(length = 8) {
-            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let result = '';
-            for (let i = 0; i < length; i++) {
-                result += characters.charAt(Math.floor(Math.random() * characters.length));
-            }
-            return result;
-        }
-
-        // Fungsi Helper untuk membuat 8 digit PIN angka
-        function makePin(length = 8) {
-            const characters = '0123456789';
-            let result = '';
-            for (let i = 0; i < length; i++) {
-                result += characters.charAt(Math.floor(Math.random() * characters.length));
-            }
-            return result;
-        }
-
-        let uniqueId = "";
-        let isUnique = false;
-        let attempts = 0;
-
-        // Loop pengecekan duplikat di Cloudflare KV
-        while (!isUnique && attempts < 10) {
-            attempts++;
-            const candidateId = makeId(8);
-            const existing = await env.CARDS_KV.get(candidateId);
-            
-            if (!existing) {
-                uniqueId = candidateId;
-                isUnique = true;
-            }
-        }
-
-        if (!isUnique) {
+        if (!idSeri || !pin) {
             return new Response(JSON.stringify({ 
                 success: false, 
-                message: "Gagal membuat ID unik, silakan coba lagi." 
-            }), { status: 500 });
+                message: "ID Seri dan PIN wajib diisi!" 
+            }), { status: 400 });
         }
 
-        const generatedPin = makePin(8);
+        // Cek Pengecekan Duplikat di Cloudflare KV
+        const existing = await env.CARDS_KV.get(idSeri);
+        if (existing) {
+            return new Response(JSON.stringify({ 
+                success: false, 
+                message: `ID Seri ${idSeri} sudah terdaftar di KV! Silakan acak ID baru.` 
+            }), { status: 400 });
+        }
 
-        // Formating struktur data default sesuai spesifikasi
+        // Formatting struktur data JSON KV
         const cardData = {
-            client_id: uniqueId,
+            client_id: idSeri,
             client_name: "",
             username: "",
             password: "",
-            pin: generatedPin,
+            pin: pin,
             google_review_url: "",
             stats: {
                 total_qr: 0,
@@ -72,12 +47,12 @@ export async function onRequestPost(context) {
             activated_at: null
         };
 
-        // Simpan ke KV dengan key berupa client_id
-        await env.CARDS_KV.put(uniqueId, JSON.stringify(cardData));
+        // Simpan ke KV dengan Key = idSeri
+        await env.CARDS_KV.put(idSeri, JSON.stringify(cardData));
 
         return new Response(JSON.stringify({ 
             success: true, 
-            message: `Kartu ${uniqueId} berhasil dibuat!`,
+            message: `Kartu ${idSeri} berhasil disimpan ke KV!`,
             data: cardData
         }), { status: 200 });
 
@@ -85,4 +60,3 @@ export async function onRequestPost(context) {
         return new Response(JSON.stringify({ success: false, message: error.message }), { status: 500 });
     }
 }
-    
