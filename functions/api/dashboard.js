@@ -1,4 +1,4 @@
-// GET: Mengambil data link, nama klien, dan statistik dari KV
+// GET: Mengambil data kartu (nama, username, link, stats, PIN, activated_at) dari KV
 export async function onRequestGet(context) {
     try {
         const { request, env } = context;
@@ -35,9 +35,11 @@ export async function onRequestGet(context) {
             success: true,
             idSeri: idSeri,
             client_name: cardData.client_name || "",
+            username: cardData.username || idSeri.toLowerCase(),
             google_review_url: cardData.google_review_url || cardData.link || "",
             stats: cardData.stats || { total_qr: 0, total_tap: 0 },
-            activated_at: cardData.activated_at || null
+            activated_at: cardData.activated_at || null,
+            pin: cardData.pin || "1234" // Mengembalikan PIN untuk tampilan Dashboard
         }), { 
             status: 200, 
             headers: { "Content-Type": "application/json" } 
@@ -51,11 +53,12 @@ export async function onRequestGet(context) {
     }
 }
 
-// POST: Memperbarui link Google Review baru dari Dashboard
+// POST: Memproses Update Link, Ubah PIN, dan Ubah Password dari Dashboard
 export async function onRequestPost(context) {
     try {
         const { request, env } = context;
-        const { idSeri: rawId, reviewUrl } = await request.json();
+        const body = await request.json();
+        const { idSeri: rawId, action } = body;
 
         if (!rawId) {
             return new Response(JSON.stringify({ success: false, message: "ID Seri tidak boleh kosong." }), { 
@@ -83,15 +86,46 @@ export async function onRequestPost(context) {
 
         let cardData = JSON.parse(rawData);
 
-        // Update URL Review pada dua field agar sinkron
-        cardData.google_review_url = reviewUrl;
-        cardData.link = reviewUrl;
+        // 1. OPSI SIMPAN LINK REVIEW
+        if (action === 'update_link') {
+            cardData.google_review_url = body.reviewUrl;
+            cardData.link = body.reviewUrl;
+        } 
+        // 2. OPSI UBAH PIN
+        else if (action === 'change_pin') {
+            const currentPin = cardData.pin || "1234";
+            if (body.oldPin !== currentPin) {
+                return new Response(JSON.stringify({ success: false, message: "PIN Lama yang Anda masukkan salah!" }), { 
+                    status: 400, 
+                    headers: { "Content-Type": "application/json" } 
+                });
+            }
+            cardData.pin = body.newPin;
+        } 
+        // 3. OPSI UBAH PASSWORD
+        else if (action === 'change_password') {
+            const currentPin = cardData.pin || "1234";
+            if (body.pinVerify !== currentPin) {
+                return new Response(JSON.stringify({ success: false, message: "Verifikasi PIN Keamanan Salah!" }), { 
+                    status: 400, 
+                    headers: { "Content-Type": "application/json" } 
+                });
+            }
+            cardData.password = body.newPassword; // Memperbarui password di KV
+        } 
+        else {
+            return new Response(JSON.stringify({ success: false, message: "Aksi tidak dikenal." }), { 
+                status: 400, 
+                headers: { "Content-Type": "application/json" } 
+            });
+        }
 
+        // Simpan perubahan data yang sudah diupdate ke Cloudflare KV
         await env.CARDS_KV.put(idSeri, JSON.stringify(cardData));
 
         return new Response(JSON.stringify({ 
             success: true, 
-            message: "Link Google Review berhasil diperbarui!" 
+            message: "Perubahan berhasil disimpan di KV!" 
         }), { 
             status: 200, 
             headers: { "Content-Type": "application/json" } 
@@ -104,4 +138,3 @@ export async function onRequestPost(context) {
         });
     }
 }
-    
